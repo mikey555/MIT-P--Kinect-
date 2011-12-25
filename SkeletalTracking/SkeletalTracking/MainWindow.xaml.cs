@@ -366,7 +366,7 @@ namespace SkeletalTracking
 
         }
         
-
+        //
         static bool smoothingEnabled = true;
         SmoothSkeleton smoothSkeleton;
         void nui_SkeletonFrameReady(object sender, SkeletonFrameReadyEventArgs e)
