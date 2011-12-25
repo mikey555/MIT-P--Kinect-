@@ -365,7 +365,7 @@ namespace SkeletalTracking
 
 
         }
-        
+        //
         //
         static bool smoothingEnabled = true;
         SmoothSkeleton smoothSkeleton;
