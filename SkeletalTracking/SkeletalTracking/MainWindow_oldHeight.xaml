@@ -1,0 +1,52 @@
+﻿<Window x:Class="SkeletalTracking.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="MainWindow" Closed="Window_Closed" Loaded="Window_Loaded" WindowState="Normal" WindowStyle="SingleBorderWindow" xmlns:my="clr-namespace:System;assembly=mscorlib" AllowsTransparency="False" Opacity="50" BorderBrush="Black" OpacityMask="#FF000032" mc:Ignorable="d" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" Height="600" Width="800" DataContext="{Binding}" Left="0" Top="0">
+    <Window.Resources>
+        <my:Double x:Key="Canvas.Top1">507</my:Double>
+        <SolidColorBrush x:Key="BlackGridLine" Color="Black" />
+
+    </Window.Resources>
+    <Canvas Name="MainCanvas" Background="White" DataContext="{Binding}">
+        <Grid Height="573" Canvas.Left="-13" Canvas.Top="0" Width="805" Name="lineGrid" Visibility="Hidden">
+            
+
+        </Grid>
+        <!--
+        <Grid Canvas.Left="-10" Canvas.Top="0" Height="569" Name="grid1" Width="802" DataContext="{Binding}" Opacity="100" ShowGridLines="True" Visibility="Hidden" OpacityMask="Lime">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" MaxHeight="30" MinHeight="30" />
+                
+                <RowDefinition Height="*" />
+
+                <RowDefinition MaxHeight="30" MinHeight="30" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+        </Grid>
+        -->
+        
+        
+        <TextBlock Canvas.Left="207" Canvas.Top="443" Height="77" Name="textBlock1" Text="" Width="413" FontFamily="Courier New" FontSize="60" FontWeight="Bold" TextAlignment="Center" />
+        <TextBlock Canvas.Left="207" Canvas.Top="493" Height="56" Name="messageBlock" Text="(uncalibrated)" Width="390" FontSize="48" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" TextAlignment="Center" />
+        <Grid Height="94" Canvas.Bottom="0" Canvas.Left="50" Width="104" Name="crosshair1" Visibility="Visible">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="96" />
+                <ColumnDefinition Width="4" />
+            </Grid.ColumnDefinitions>
+            <Line X1="12" Y1="50" X2="89" Y2="50" Stroke="Black" StrokeThickness="4" Canvas.Left="51" Canvas.Top="467" Height="94" Width="100" Grid.ColumnSpan="2" />
+            <Line Canvas.Left="51" Canvas.Top="467" Height="94" Stroke="Black" StrokeThickness="4" Width="100" X1="50" X2="50" Y1="90" Y2="10" Grid.ColumnSpan="2" />
+        </Grid>
+        <Grid Height="94" Canvas.Bottom="0" Canvas.Right="50" Width="104" Name="crosshair2" Visibility="Visible">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="96" />
+                <ColumnDefinition Width="4" />
+            </Grid.ColumnDefinitions>
+            <Line X1="12" Y1="50" X2="89" Y2="50" Stroke="Black" StrokeThickness="4" Canvas.Left="51" Canvas.Top="467" Height="94" Width="100" Grid.ColumnSpan="2" />
+            <Line Canvas.Left="51" Canvas.Top="467" Height="94" Stroke="Black" StrokeThickness="4" Width="100" X1="50" X2="50" Y1="90" Y2="10" Grid.ColumnSpan="2" />
+        </Grid>
+    </Canvas>
+</Window>

@@ -1,0 +1,36 @@
+C:\Program Files\Microsoft SDKs\Kinect\v1.0 Beta2\Samples\KinectSDKSamples\Managed\KinectWpfViewers\bin\Debug\Microsoft.Samples.Kinect.WpfViewers.dll
+C:\Program Files\Microsoft SDKs\Kinect\v1.0 Beta2\Samples\KinectSDKSamples\Managed\KinectWpfViewers\bin\Debug\Microsoft.Samples.Kinect.WpfViewers.pdb
+C:\Program Files\Microsoft SDKs\Kinect\v1.0 Beta2\Samples\KinectSDKSamples\Managed\KinectWpfViewers\obj\Debug\ResolveAssemblyReference.cache
+C:\Program Files\Microsoft SDKs\Kinect\v1.0 Beta2\Samples\KinectSDKSamples\Managed\KinectWpfViewers\obj\Debug\KinectDepthViewer.baml
+C:\Program Files\Microsoft SDKs\Kinect\v1.0 Beta2\Samples\KinectSDKSamples\Managed\KinectWpfViewers\obj\Debug\KinectColorViewer.baml
+C:\Program Files\Microsoft SDKs\Kinect\v1.0 Beta2\Samples\KinectSDKSamples\Managed\KinectWpfViewers\obj\Debug\KinectDepthViewer.g.cs
+C:\Program Files\Microsoft SDKs\Kinect\v1.0 Beta2\Samples\KinectSDKSamples\Managed\KinectWpfViewers\obj\Debug\KinectColorViewer.g.cs
+C:\Program Files\Microsoft SDKs\Kinect\v1.0 Beta2\Samples\KinectSDKSamples\Managed\KinectWpfViewers\obj\Debug\KinectDiagnosticViewer.g.cs
+C:\Program Files\Microsoft SDKs\Kinect\v1.0 Beta2\Samples\KinectSDKSamples\Managed\KinectWpfViewers\obj\Debug\GeneratedInternalTypeHelper.g.cs
+C:\Program Files\Microsoft SDKs\Kinect\v1.0 Beta2\Samples\KinectSDKSamples\Managed\KinectWpfViewers\obj\Debug\Microsoft.Samples.Kinect.WpfViewers_MarkupCompile.cache
+C:\Program Files\Microsoft SDKs\Kinect\v1.0 Beta2\Samples\KinectSDKSamples\Managed\KinectWpfViewers\obj\Debug\Microsoft.Samples.Kinect.WpfViewers_MarkupCompile.lref
+C:\Program Files\Microsoft SDKs\Kinect\v1.0 Beta2\Samples\KinectSDKSamples\Managed\KinectWpfViewers\obj\Debug\KinectDiagnosticViewer.baml
+C:\Program Files\Microsoft SDKs\Kinect\v1.0 Beta2\Samples\KinectSDKSamples\Managed\KinectWpfViewers\obj\Debug\Microsoft.Samples.Kinect.WpfViewers.g.resources
+C:\Program Files\Microsoft SDKs\Kinect\v1.0 Beta2\Samples\KinectSDKSamples\Managed\KinectWpfViewers\obj\Debug\Microsoft.Samples.Kinect.WpfViewers.Properties.Resources.resources
+C:\Program Files\Microsoft SDKs\Kinect\v1.0 Beta2\Samples\KinectSDKSamples\Managed\KinectWpfViewers\obj\Debug\GenerateResource.read.1.tlog
+C:\Program Files\Microsoft SDKs\Kinect\v1.0 Beta2\Samples\KinectSDKSamples\Managed\KinectWpfViewers\obj\Debug\GenerateResource.write.1.tlog
+C:\Program Files\Microsoft SDKs\Kinect\v1.0 Beta2\Samples\KinectSDKSamples\Managed\KinectWpfViewers\obj\Debug\Microsoft.Samples.Kinect.WpfViewers.dll
+C:\Program Files\Microsoft SDKs\Kinect\v1.0 Beta2\Samples\KinectSDKSamples\Managed\KinectWpfViewers\obj\Debug\Microsoft.Samples.Kinect.WpfViewers.pdb
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\KinectDemo\SkeletonDemo\SkeletalTracking\KinectWpfViewers\bin\Debug\Microsoft.Samples.Kinect.WpfViewers.dll
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\KinectDemo\SkeletonDemo\SkeletalTracking\KinectWpfViewers\bin\Debug\Microsoft.Samples.Kinect.WpfViewers.pdb
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\KinectDemo\SkeletonDemo\SkeletalTracking\KinectWpfViewers\obj\Debug\ResolveAssemblyReference.cache
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\KinectDemo\SkeletonDemo\SkeletalTracking\KinectWpfViewers\obj\Debug\KinectDepthViewer.baml
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\KinectDemo\SkeletonDemo\SkeletalTracking\KinectWpfViewers\obj\Debug\KinectColorViewer.baml
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\KinectDemo\SkeletonDemo\SkeletalTracking\KinectWpfViewers\obj\Debug\KinectDepthViewer.g.cs
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\KinectDemo\SkeletonDemo\SkeletalTracking\KinectWpfViewers\obj\Debug\KinectColorViewer.g.cs
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\KinectDemo\SkeletonDemo\SkeletalTracking\KinectWpfViewers\obj\Debug\KinectDiagnosticViewer.g.cs
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\KinectDemo\SkeletonDemo\SkeletalTracking\KinectWpfViewers\obj\Debug\GeneratedInternalTypeHelper.g.cs
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\KinectDemo\SkeletonDemo\SkeletalTracking\KinectWpfViewers\obj\Debug\Microsoft.Samples.Kinect.WpfViewers_MarkupCompile.cache
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\KinectDemo\SkeletonDemo\SkeletalTracking\KinectWpfViewers\obj\Debug\Microsoft.Samples.Kinect.WpfViewers_MarkupCompile.lref
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\KinectDemo\SkeletonDemo\SkeletalTracking\KinectWpfViewers\obj\Debug\KinectDiagnosticViewer.baml
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\KinectDemo\SkeletonDemo\SkeletalTracking\KinectWpfViewers\obj\Debug\Microsoft.Samples.Kinect.WpfViewers.g.resources
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\KinectDemo\SkeletonDemo\SkeletalTracking\KinectWpfViewers\obj\Debug\Microsoft.Samples.Kinect.WpfViewers.Properties.Resources.resources
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\KinectDemo\SkeletonDemo\SkeletalTracking\KinectWpfViewers\obj\Debug\GenerateResource.read.1.tlog
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\KinectDemo\SkeletonDemo\SkeletalTracking\KinectWpfViewers\obj\Debug\GenerateResource.write.1.tlog
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\KinectDemo\SkeletonDemo\SkeletalTracking\KinectWpfViewers\obj\Debug\Microsoft.Samples.Kinect.WpfViewers.dll
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\KinectDemo\SkeletonDemo\SkeletalTracking\KinectWpfViewers\obj\Debug\Microsoft.Samples.Kinect.WpfViewers.pdb

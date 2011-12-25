@@ -1,0 +1,37 @@
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\Quickstarts\5.Skeletal Tracking\SkeletalTracking\SkeletalTracking\SkeletalTracking\bin\Debug\SkeletalTracking.exe
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\Quickstarts\5.Skeletal Tracking\SkeletalTracking\SkeletalTracking\SkeletalTracking\bin\Debug\SkeletalTracking.pdb
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\Quickstarts\5.Skeletal Tracking\SkeletalTracking\SkeletalTracking\SkeletalTracking\bin\Debug\Coding4Fun.Kinect.Wpf.dll
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\Quickstarts\5.Skeletal Tracking\SkeletalTracking\SkeletalTracking\SkeletalTracking\bin\Debug\Coding4Fun.Kinect.Wpf.pdb
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\Quickstarts\5.Skeletal Tracking\SkeletalTracking\SkeletalTracking\SkeletalTracking\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\Quickstarts\5.Skeletal Tracking\SkeletalTracking\SkeletalTracking\SkeletalTracking\obj\x86\Debug\MainWindow.baml
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\Quickstarts\5.Skeletal Tracking\SkeletalTracking\SkeletalTracking\SkeletalTracking\obj\x86\Debug\MainWindow.g.cs
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\Quickstarts\5.Skeletal Tracking\SkeletalTracking\SkeletalTracking\SkeletalTracking\obj\x86\Debug\App.g.cs
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\Quickstarts\5.Skeletal Tracking\SkeletalTracking\SkeletalTracking\SkeletalTracking\obj\x86\Debug\SkeletalTracking_MarkupCompile.cache
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\Quickstarts\5.Skeletal Tracking\SkeletalTracking\SkeletalTracking\SkeletalTracking\obj\x86\Debug\SkeletalTracking.g.resources
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\Quickstarts\5.Skeletal Tracking\SkeletalTracking\SkeletalTracking\SkeletalTracking\obj\x86\Debug\SkeletalTracking.Properties.Resources.resources
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\Quickstarts\5.Skeletal Tracking\SkeletalTracking\SkeletalTracking\SkeletalTracking\obj\x86\Debug\GenerateResource.read.1.tlog
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\Quickstarts\5.Skeletal Tracking\SkeletalTracking\SkeletalTracking\SkeletalTracking\obj\x86\Debug\GenerateResource.write.1.tlog
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\Quickstarts\5.Skeletal Tracking\SkeletalTracking\SkeletalTracking\SkeletalTracking\obj\x86\Debug\SkeletalTracking.exe
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\Quickstarts\5.Skeletal Tracking\SkeletalTracking\SkeletalTracking\SkeletalTracking\obj\x86\Debug\SkeletalTracking.pdb
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\KinectDemo\SkeletonDemo\SkeletalTracking\SkeletalTracking\SkeletalTracking\bin\Debug\SkeletalTracking.exe.config
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\KinectDemo\SkeletonDemo\SkeletalTracking\SkeletalTracking\SkeletalTracking\bin\Debug\SkeletalTracking.exe
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\KinectDemo\SkeletonDemo\SkeletalTracking\SkeletalTracking\SkeletalTracking\bin\Debug\SkeletalTracking.pdb
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\KinectDemo\SkeletonDemo\SkeletalTracking\SkeletalTracking\SkeletalTracking\bin\Debug\Coding4Fun.Kinect.Wpf.dll
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\KinectDemo\SkeletonDemo\SkeletalTracking\SkeletalTracking\SkeletalTracking\bin\Debug\Microsoft.Samples.Kinect.WpfViewers.dll
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\KinectDemo\SkeletonDemo\SkeletalTracking\SkeletalTracking\SkeletalTracking\bin\Debug\SkeletalViewer.exe
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\KinectDemo\SkeletonDemo\SkeletalTracking\SkeletalTracking\SkeletalTracking\bin\Debug\Microsoft.Samples.Kinect.WpfViewers.pdb
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\KinectDemo\SkeletonDemo\SkeletalTracking\SkeletalTracking\SkeletalTracking\bin\Debug\SkeletalViewer.pdb
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\KinectDemo\SkeletonDemo\SkeletalTracking\SkeletalTracking\SkeletalTracking\bin\Debug\Coding4Fun.Kinect.Wpf.pdb
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\KinectDemo\SkeletonDemo\SkeletalTracking\SkeletalTracking\SkeletalTracking\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\KinectDemo\SkeletonDemo\SkeletalTracking\SkeletalTracking\SkeletalTracking\obj\x86\Debug\MainWindow.baml
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\KinectDemo\SkeletonDemo\SkeletalTracking\SkeletalTracking\SkeletalTracking\obj\x86\Debug\Window1.baml
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\KinectDemo\SkeletonDemo\SkeletalTracking\SkeletalTracking\SkeletalTracking\obj\x86\Debug\MainWindow.g.cs
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\KinectDemo\SkeletonDemo\SkeletalTracking\SkeletalTracking\SkeletalTracking\obj\x86\Debug\Window1.g.cs
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\KinectDemo\SkeletonDemo\SkeletalTracking\SkeletalTracking\SkeletalTracking\obj\x86\Debug\App.g.cs
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\KinectDemo\SkeletonDemo\SkeletalTracking\SkeletalTracking\SkeletalTracking\obj\x86\Debug\SkeletalTracking_MarkupCompile.cache
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\KinectDemo\SkeletonDemo\SkeletalTracking\SkeletalTracking\SkeletalTracking\obj\x86\Debug\SkeletalTracking.g.resources
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\KinectDemo\SkeletonDemo\SkeletalTracking\SkeletalTracking\SkeletalTracking\obj\x86\Debug\SkeletalTracking.Properties.Resources.resources
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\KinectDemo\SkeletonDemo\SkeletalTracking\SkeletalTracking\SkeletalTracking\obj\x86\Debug\GenerateResource.read.1.tlog
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\KinectDemo\SkeletonDemo\SkeletalTracking\SkeletalTracking\SkeletalTracking\obj\x86\Debug\GenerateResource.write.1.tlog
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\KinectDemo\SkeletonDemo\SkeletalTracking\SkeletalTracking\SkeletalTracking\obj\x86\Debug\SkeletalTracking.exe
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\KinectDemo\SkeletonDemo\SkeletalTracking\SkeletalTracking\SkeletalTracking\obj\x86\Debug\SkeletalTracking.pdb
