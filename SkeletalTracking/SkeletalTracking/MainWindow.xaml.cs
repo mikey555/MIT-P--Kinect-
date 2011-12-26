@@ -35,90 +35,43 @@ namespace SkeletalTracking
     public partial class MainWindow : Window
     {
         Runtime nui;
+        
 
         public MainWindow()
         {
             InitializeComponent();
             nui = Runtime.Kinects[0];
+            
         }
 
         // Grid setup
 
 
-
-
-        int gapSize = 50;
-        DoubleCollection lineStyle = new DoubleCollection();
-        public int gridUnits;
-        public void setGridUnits(int gridUnits)
+        public void updateGrid(System.Collections.ArrayList linesList)
         {
-
+            //IEnumerator<Line> childrenEnumerator = (IEnumerator<Line>) grid.Children.GetEnumerator();
             lineGrid.Children.Clear();
-            lineGrid.SetValue(WidthProperty, ActualWidth);
-            lineGrid.SetValue(HeightProperty, ActualHeight);
-
-            int gridSize = Convert.ToInt32(lineGrid.Height - gapSize * 2) / gridUnits;
-            if (gridUnits == 0)
+            foreach (Line l in linesList)
             {
-                gridSize = Convert.ToInt32(lineGrid.Height - gapSize * 2);
+                lineGrid.Children.Add(l);
             }
-
-            // rows
-            Line topLine = new Line();
-            topLine.Stroke = System.Windows.Media.Brushes.Black;
-            topLine.X1 = 0;
-            topLine.X2 = this.Width;
-            topLine.Y1 = gapSize;
-            topLine.Y2 = gapSize;
-            topLine.StrokeThickness = 3;
-            topLine.StrokeDashArray = lineStyle;
-            lineGrid.Children.Add(topLine);
-
-            Line bottomLine = new Line();
-            bottomLine.Stroke = System.Windows.Media.Brushes.Black;
-            bottomLine.X1 = 0;
-            bottomLine.X2 = this.Width;
-            bottomLine.Y1 = lineGrid.Height - gapSize;
-            bottomLine.Y2 = lineGrid.Height - gapSize;
-            bottomLine.StrokeThickness = 3;
-            bottomLine.StrokeDashArray = lineStyle;
-            lineGrid.Children.Add(bottomLine);
-
-            for (int i = 1; i < gridUnits; i++)
-            {
-                Line midLine = new Line();
-                midLine.Stroke = System.Windows.Media.Brushes.Black;
-                midLine.X1 = 0;
-                midLine.X2 = this.Width;
-                midLine.Y1 = i * gridSize + gapSize;
-                midLine.Y2 = i * gridSize + gapSize;
-                midLine.StrokeThickness = 1;
-                midLine.StrokeDashArray = lineStyle;
-                lineGrid.Children.Add(midLine);
-            }
-
-            // columns
-            for (int j = 1; j < lineGrid.Width / gridUnits; j++)
-            {
-                Line midLine = new Line();
-                midLine.Stroke = System.Windows.Media.Brushes.Black;
-                midLine.Y1 = 0;
-                midLine.Y2 = lineGrid.Height;
-                midLine.X1 = j * gridSize;
-                midLine.X2 = j * gridSize;
-                midLine.StrokeThickness = 1;
-                midLine.StrokeDashArray = lineStyle;
-                lineGrid.Children.Add(midLine);
-            }
-
-
-
+            
+            
         }
+        
+
+        
+        
+        
+        
+        
+        
 
         public void showGridUnits()
         {
 
             lineGrid.SetValue(VisibilityProperty, Visibility.Visible);
+            
         }
 
         public void hideGridUnits()
@@ -532,12 +485,7 @@ namespace SkeletalTracking
             nui.Uninitialize();
         }
 
-        private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-
-            setGridUnits(gridUnits);
-
-        }
+        
 
 
 
