@@ -40,7 +40,7 @@ namespace SkeletalTracking
         CalibrationSettings calibrationSettings;
 
         SmoothSkeleton smoothSkeleton; // what should this be called???
-        SkeletonData skeleton;          // the current skeleton
+        SkeletonData skeleton;         // the current skeleton
         
         Runtime nui;
         
@@ -198,14 +198,28 @@ namespace SkeletalTracking
         //    colorWindow.changeHandOrientation(1);
         //}
 
+        public void enableCalibrateButton()
+        {
+            calibrateButton.IsEnabled = true;
+        }
+        public void disableCalibrateButton()
+        {
+            calibrateButton.IsEnabled = false;
+        }
 
         private void calibrateButton_Click(object sender, RoutedEventArgs e)
         {
+            
+            if (!CalibrationSettings.inCalibrationMode)
+            {
+                disableCalibrateButton();
                 myDispatcherTimer = new System.Windows.Threading.DispatcherTimer();
                 myDispatcherTimer.Interval = new TimeSpan(0, 0, 1); // 1 second
                 myDispatcherTimer.Tick += new EventHandler(Each_Tick);
                 myDispatcherTimer.Start();
+            }
         }
+
         
 
         int countDown = 5;
@@ -214,14 +228,16 @@ namespace SkeletalTracking
             if (countDown == 0)
             {
                 myDispatcherTimer.Stop();
-                calibrateButton.SetValue(IsEnabledProperty, false);
+                //calibrateButton.SetValue(IsEnabledProperty, false);
                 calibrationSettings.setCalibrationMode(true);
                 
-                calibrationSettings.calibrate(skeleton);
+                // calibrate returns a string indicating success or failure.
+                // if success, it sets the calibration baseline.
+                sendMessage(calibrationSettings.calibrate(skeleton));
                 
-                calibrateButton.SetValue(IsEnabledProperty, true);
-                calibrateButton.Content = "Calibrate";
-                
+                //calibrateButton.SetValue(IsEnabledProperty, true);
+                //calibrateButton.Content = "Calibrate";
+                enableCalibrateButton();
                 // restart countdown
                 countDown = 5;
 
@@ -667,6 +683,8 @@ namespace SkeletalTracking
 
         public ToleranceSettings()
         {
+            arrayPrecision = .001;
+            
             // relative or absolute tolerance?
             toleranceMode = false;
             maxTolerance = 0;
@@ -675,7 +693,7 @@ namespace SkeletalTracking
             // these are constrained
             leftHandRatio = 1;
             rightHandRatio = 1;
-            proportion = 1;
+            proportion = 1.333; // can only have 2 decimal digits!!
             
             tolerance = .1;
             greenYellowFade = .01;
@@ -684,7 +702,7 @@ namespace SkeletalTracking
             recalculateGradientPoints();
             createColorArray();
 
-            arrayPrecision = .001;
+            
         }
 
         private void updateToleranceSettings()
@@ -700,12 +718,21 @@ namespace SkeletalTracking
         /// </summary>
         private void recalculateGradientPoints()
         {
-            bottomTolerance = proportion - (tolerance * 1 / 2);
-            topTolerance = proportion + (tolerance * 1 / 2);
-            topYellow = proportion + (tolerance * 1 / 2) + greenYellowFade;
-            bottomYellow = proportion - (tolerance * 1 / 2) - greenYellowFade;
-            topRed = proportion + (tolerance * 1 / 2) + greenYellowFade + yellowRedFade;
-            bottomRed = proportion - (tolerance * 1 / 2) - greenYellowFade - yellowRedFade;
+            // double arithmetic precision sucks, so round numbers to two decimal places
+            // (this is the precision we are working with, after all)
+            bottomTolerance = proportion - (tolerance / 2);
+            bottomTolerance = Math.Round(bottomTolerance, 3);
+            topTolerance = proportion + (tolerance / 2);
+            topTolerance = Math.Round(topTolerance, 3);
+            topYellow = proportion + (tolerance / 2) + greenYellowFade;
+            topYellow = Math.Round(topYellow, 3);
+            bottomYellow = proportion - (tolerance / 2) - greenYellowFade;
+            bottomYellow = Math.Round(bottomYellow, 3);
+            topRed = proportion + greenYellowFade + yellowRedFade + (tolerance / 2);
+            topRed = Math.Round(topRed, 3);
+            bottomRed = proportion - greenYellowFade - yellowRedFade - (tolerance / 2);
+            bottomRed = Math.Round(bottomRed, 3);
+            //bottomRed = proportion - fadeDistance;
         }
 
         public void setToleranceMode(bool mode)
@@ -758,6 +785,7 @@ namespace SkeletalTracking
             // red to yellow
             for (double map = 0, index = arrayIndex; index < yellowRedFadeColors; map += (arrayPrecision/yellowRedFade), index++)
             {
+                map = Math.Round(map, 3);
                 Color color = ColorInterpolator.InterpolateBetween(Colors.Red, Colors.Yellow, map);
                 arrayIndex = Convert.ToInt32(index);
                 SolidColorBrush newBrush = new SolidColorBrush(color);
@@ -769,6 +797,7 @@ namespace SkeletalTracking
             // yellow to green
             for (double map = 0, index = arrayIndex; index < yellowRedFadeColors + greenYellowFadeColors; map += (arrayPrecision / greenYellowFade), index++)
             {
+                map = Math.Round(map, 3);
                 Color color = ColorInterpolator.InterpolateBetween(Colors.Yellow, Colors.Green, map);
                 arrayIndex = Convert.ToInt32(index);
                 SolidColorBrush newBrush = new SolidColorBrush(color);
@@ -804,7 +833,7 @@ namespace SkeletalTracking
 
             // SET THE CROSSHAIRS
 
-            double currentProportion = calibratedLeftHandPosition / calibratedRightHandPosition;
+            double currentProportion = Math.Round(calibratedLeftHandPosition / calibratedRightHandPosition, 3);
 
             // implement relative tolerance
 
@@ -816,7 +845,7 @@ namespace SkeletalTracking
             }
             else
             {
-                int index = Convert.ToInt32((currentProportion - bottomRed) * (1 / arrayPrecision));
+                int index = Convert.ToInt32((currentProportion - bottomRed) * (1 / arrayPrecision)) - 1;
                 return brushArray[index];
             }
 
@@ -982,7 +1011,7 @@ namespace SkeletalTracking
 
     public class CalibrationSettings
     {
-        bool inCalibrationMode;
+        public static bool inCalibrationMode;
         double crosshairRate;
         public static double calibrationBaseline;
         bool isCalibrated;
@@ -1035,6 +1064,7 @@ namespace SkeletalTracking
             // only attempt to calibrate if skeleton is not null
             if (checkForSkeleton(skeleton) == false)
             {
+                inCalibrationMode = false;
                 return "person not recognized";
             }
             else
@@ -1064,7 +1094,7 @@ namespace SkeletalTracking
                         isCalibrated = true;
                     }
                 }
-
+                inCalibrationMode = false;
                 return "calibrated!";
             }
         }
