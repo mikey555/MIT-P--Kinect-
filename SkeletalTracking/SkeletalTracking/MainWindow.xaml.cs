@@ -34,13 +34,13 @@ namespace SkeletalTracking
     /// </summary>
     public partial class MainWindow : Window
     {
-        Runtime nui;
+        
         
 
         public MainWindow()
         {
             InitializeComponent();
-            nui = Runtime.Kinects[0];
+            
             
         }
 
@@ -92,7 +92,7 @@ namespace SkeletalTracking
 
 
 
-
+        /*
 
 
         // tolerance:
@@ -141,12 +141,19 @@ namespace SkeletalTracking
                 tolerance = (double)toleranceValue / 100;
             }
         }
-
+        
 
         SkeletonData skeleton;
+        
         bool inCalibrationMode = false;
-        bool crosshairsEnabled = true;
+         
+        
         double crosshairRate;
+        */
+
+
+        // these stay here
+        bool crosshairsEnabled = true;
         public void setCrosshairs()
         {
             if (crosshairsEnabled == true)
@@ -162,26 +169,27 @@ namespace SkeletalTracking
                 crosshairsEnabled = true;
             }
         }
+        /*
+                public void setCalibrationMode(bool value)
+                {
+                    if (!inCalibrationMode)
+                    {
+                        inCalibrationMode = value;
+                    }
+                }
 
-        public void setCalibrationMode(bool value)
-        {
-            if (!inCalibrationMode)
-            {
-                inCalibrationMode = value;
-            }
-        }
+        
 
-
-
-        public void sendMessage(string message)
-        {
-            messageBlock.Text = message;
-        }
-
+                // check for references to this
+                public void sendMessage(string message)
+                {
+                    messageBlock.Text = message;
+                }
+                 
 
 
         double calibrationBaseline = 0;
-
+        
         public void callCalibrate()
         {
             calibrate(skeleton);
@@ -206,6 +214,7 @@ namespace SkeletalTracking
 
 
         bool isCalibrated = false;
+         
         public void calibrate(SkeletonData skeleton)
         {
             // reset isCalibrated
@@ -250,19 +259,11 @@ namespace SkeletalTracking
                 sendMessage("calibrated!");
             }
         }
+        
 
 
 
 
-        public void setTilt(int angle)
-        {
-            if (nui.NuiCamera.TrySetAngle(angle))
-                sendMessage("Moving the sensor..");
-            else
-                sendMessage("Error occured moving the sensor..");
-
-
-        }
 
 
 
@@ -286,7 +287,9 @@ namespace SkeletalTracking
         {
             proportion = leftHandRatio / rightHandRatio;
         }
+        */
 
+        /*
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
 
@@ -318,6 +321,7 @@ namespace SkeletalTracking
 
 
         }
+         
         
 
         static bool smoothingEnabled = true;
@@ -361,12 +365,19 @@ namespace SkeletalTracking
                 }
             //}
         }
+    */
 
 
 
 
-
-        //private void SetColor(double setProportion, SkeletonData skeleton)
+        /// <summary>
+        /// set crosshair positions
+        /// create a current proportion out of calibrated hand positions
+        /// if relative tolerance enabled, changes tolerance based on height of highest hand
+        /// display current ratio value
+        /// </summary>
+        /// <param name="setProportion">the "secret" proportion</param>
+        /// <param name="skeleton">the current SmoothSkeleton</param>
         private void SetColor(double setProportion, SmoothSkeleton skeleton)
         {
 
@@ -420,10 +431,10 @@ namespace SkeletalTracking
             // determine gradient points
             double bottomTolerance = setProportion - (tolerance * 1/2);
             double topTolerance = setProportion + (tolerance * 1/2);
-            double topYellow = setProportion + (tolerance * 1 / 2) + greenYellowFade;
-            double bottomYellow = setProportion - (tolerance * 1 / 2) - greenYellowFade;
-            double topRed = setProportion + (tolerance * 1 / 2) + greenYellowFade + yellowRedFade;
-            double bottomRed = setProportion - (tolerance * 1 / 2) - greenYellowFade - yellowRedFade;
+            double topYellow = setProportion + (tolerance * 1/2) + greenYellowFade;
+            double bottomYellow = setProportion - (tolerance * 1/2) - greenYellowFade;
+            double topRed = setProportion + (tolerance * 1/2) + greenYellowFade + yellowRedFade;
+            double bottomRed = setProportion - (tolerance * 1/2) - greenYellowFade - yellowRedFade;
 
             // determine gradient mappings
             // slope*currentProportion - y-intercept
@@ -478,17 +489,17 @@ namespace SkeletalTracking
 
             MainCanvas.Background = interpolatedColorBrush;      // set Background to a colorString, e.g. "#113355FF"
         }
-
+        /*
         private void Window_Closed(object sender, EventArgs e)
         {
             //Cleanup
             nui.Uninitialize();
         }
-
-        
-
+        */
 
 
+
+        /*
         public class SmoothSkeleton
         {
 
@@ -601,19 +612,14 @@ namespace SkeletalTracking
                     leftOutput = newLeft;
                     rightOutput = newRight;
                 }
-
-
             }
-
-
-
-
         }
+         
 
         class ColorInterpolator
         {
             delegate byte ComponentSelector(System.Windows.Media.Color color);
-            static ComponentSelector _redSelector = color => color.R;
+            static ComponentSelector _redSelector = color = > color.R;
             static ComponentSelector _greenSelector = color => color.G;
             static ComponentSelector _blueSelector = color => color.B;
 
@@ -642,30 +648,15 @@ namespace SkeletalTracking
                 double lambda,
                 ComponentSelector selector)
             {
+                // redComponent(endPoint1) + lambda*difference between endPoints
                 return (byte)(selector(endPoint1)
-                    + (selector(endPoint2) - selector(endPoint1)) * lambda);
+                    + (selector(endPoint2) - selector(endPoint1)) 
+                    * lambda);
             }
         }
+          */
 
     }   
 
 }
 
-namespace Kinect.Extensions
-{
-    public static class CameraExtensions
-    {
-        public static bool TrySetAngle(this Camera camera, int angle)
-        {
-            try
-            {
-                camera.ElevationAngle = angle;
-                return true;
-            }
-            catch (Exception e)
-            {
-                return false;
-            }
-        }
-    }
-}

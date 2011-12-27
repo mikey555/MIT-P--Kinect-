@@ -10,6 +10,9 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using Microsoft.Research.Kinect.Nui;
+using Coding4Fun.Kinect.Wpf;
+using Kinect.Extensions;
 
 namespace SkeletalTracking
 {
@@ -23,17 +26,36 @@ namespace SkeletalTracking
     
     public partial class Window1 : Window
     {
+
+        // Developer Options
+        const double dev_ColorWindowHeight = 1050;
+        const double dev_ColorWindowWidth = 800;
+        const int dev_scaledKinectWidth = 640;
+        const int dev_scaledKinectHeight = 480;
+        
         // public static MainWindow colorWindow = new MainWindow();
         public static MainWindow colorWindow;
-        GridSetup gridSetup;
+        GridSettings gridSettings;
+        ToleranceSettings toleranceSettings;
+        SmoothSkeleton smoothSkeleton; // what should this be called???
+        SkeletonData skeleton;          // the current skeleton
+        CalibrationSettings calibrationSettings;
+        Runtime nui;
         
         public Window1()
         {
+            
+            
             colorWindow = new MainWindow();
+            
             InitializeComponent();
+            
 
             // initialize grid
-            gridSetup = new GridSetup(colorWindow.Height, colorWindow.Width);
+            gridSettings = new GridSettings(colorWindow.Width, colorWindow.Height);
+            toleranceSettings = new ToleranceSettings();
+            smoothSkeleton = new SmoothSkeleton();
+            calibrationSettings = new CalibrationSettings();
             this.updateGrid();
 
 
@@ -45,8 +67,12 @@ namespace SkeletalTracking
         }
 
         public void updateGrid() {
-            colorWindow.updateGrid(gridSetup.lines);
+            colorWindow.updateGrid(gridSettings.lines);
+            colorWindow.lineGrid.SetValue(WidthProperty, gridSettings.gridWidth);
+            colorWindow.lineGrid.SetValue(HeightProperty, gridSettings.gridHeight);
         }
+
+        
 
         System.Windows.Threading.DispatcherTimer myDispatcherTimer;
 
@@ -59,7 +85,85 @@ namespace SkeletalTracking
         SkeletalViewer.MainWindow viewer = new SkeletalViewer.MainWindow();
         bool viewerOpen = false;
 
+
+
+
+
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+
+            //Initialize to do skeletal tracking
+            nui.Initialize(RuntimeOptions.UseSkeletalTracking);
+
+            #region TransformSmooth
+            //Must set to true and set after call to Initialize
+            nui.SkeletonEngine.TransformSmooth = false;
+
+            //Use to transform and reduce jitter
+            var parameters = new TransformSmoothParameters
+            {
+                Smoothing = .5f, // default .5f
+                Correction = 0.0f,
+                Prediction = 0.0f,
+                JitterRadius = 0.05f, // default .005f
+                MaxDeviationRadius = 0.05f
+            };
+
+            nui.SkeletonEngine.SmoothParameters = parameters;
+
+            #endregion
+
+            //add event to receive skeleton data
+            nui.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(nui_SkeletonFrameReady);
+
+        }
+
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            //Cleanup
+            nui.Uninitialize();
+        }
+
         
+        void nui_SkeletonFrameReady(object sender, SkeletonFrameReadyEventArgs e)
+        {
+
+            SkeletonFrame allSkeletons = e.SkeletonFrame;
+            // allSkeletons is not null iff allSkeletons has a skeleton?
+            skeleton = (from s in allSkeletons.Skeletons
+                        where s.TrackingState == SkeletonTrackingState.Tracked
+                        select s).FirstOrDefault();
+
+            if (skeleton != null)
+            {
+                var leftHandY = skeleton.Joints[JointID.HandLeft].ScaleTo(dev_scaledKinectWidth, dev_scaledKinectHeight, .5f, .5f).Position.Y;
+                var rightHandY = skeleton.Joints[JointID.HandRight].ScaleTo(dev_scaledKinectWidth, dev_scaledKinectHeight, .5f, .5f).Position.Y;
+
+
+                if (allSkeletons.FrameNumber % 1 == 0)              // how many skeletons/second should be looked at and smoothed?
+                {
+                    // initial skeleton
+                    if (smoothSkeleton == null)
+                    {
+                        smoothSkeleton = new SmoothSkeleton(leftHandY, rightHandY);
+                    }
+                    // process every new skeleton
+                    else
+                    {
+                        smoothSkeleton.update(leftHandY, rightHandY);
+                    }
+
+                    // 
+                    // Console.Write(allSkeletons.FrameNumber + " " + allSkeletons.TimeStamp + " ");
+
+                    // set background color
+                    SetColor(proportion, smoothSkeleton);
+                }
+            }
+            //}
+        }
+
 
         private void slider1_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
@@ -98,17 +202,19 @@ namespace SkeletalTracking
             {
                 myDispatcherTimer.Stop();
                 calibrateButton.SetValue(IsEnabledProperty, false);
-                colorWindow.setCalibrationMode(true);
+                calibrationSettings.setCalibrationMode(true);
                 
-                colorWindow.callCalibrate();
+                calibrationSettings.callCalibrate();
                 
                 calibrateButton.SetValue(IsEnabledProperty, true);
                 calibrateButton.Content = "Calibrate";
+                
+                // restart countdown
                 countDown = 5;
 
             }
             else {
-                colorWindow.sendMessage("Calibrating in... " + countDown--.ToString());
+               sendMessage("Calibrating in... " + countDown--.ToString());
             }
         }
 
@@ -150,7 +256,7 @@ namespace SkeletalTracking
             if (textBox1.Text != "")
             {
                 int value = Int32.Parse(textBox1.Text);
-                colorWindow.setTolerance(value);
+                toleranceSettings.setTolerance(value);
             }
         }
 
@@ -163,23 +269,23 @@ namespace SkeletalTracking
 
         private void setTiltButton_Click(object sender, RoutedEventArgs e)
         {
-            colorWindow.setTilt(tiltValue);
+            this.setTilt(tiltValue);
         }
 
         private void toleranceOption1_Checked(object sender, RoutedEventArgs e)
         {
-            colorWindow.setToleranceMode(false);
+            toleranceSettings.setToleranceMode(false);
         }
 
         private void toleranceOption2_Checked(object sender, RoutedEventArgs e)
         {
-            colorWindow.setToleranceMode(true);
+            toleranceSettings.setToleranceMode(true);
         }
 
         private void setToleranceRange_Click(object sender, RoutedEventArgs e)
         {
-            colorWindow.setMinTolerance(Convert.ToInt32(minToleranceBox.Text));
-            colorWindow.setMaxTolerance(Convert.ToInt32(maxToleranceBox.Text));
+            toleranceSettings.setMinTolerance(Convert.ToInt32(minToleranceBox.Text));
+            toleranceSettings.setMaxTolerance(Convert.ToInt32(maxToleranceBox.Text));
             toleranceOption2.SetValue(IsEnabledProperty, true);
         }
 
@@ -191,32 +297,42 @@ namespace SkeletalTracking
         private void HideRatioValueCheckbox_Unchecked(object sender, RoutedEventArgs e)
         {
             colorWindow.textBlock1.SetValue(VisibilityProperty, Visibility.Visible);
+            
         }
 
         private void numberOfGridUnits_TextChanged(object sender, TextChangedEventArgs e)
         {
-            //colorWindow.gridUnits = Convert.ToInt32(numberOfGridUnits.Text);
-            try {
-            gridSetup.gridUnits = Convert.ToInt32(numberOfGridUnits.Text);
+            
+            try 
+            {
+                int newGridUnits = Convert.ToInt32(numberOfGridUnits.Text);
+                if (newGridUnits < 1)
+                {
+                    //message.Text = "GRID UNITS: please enter a number greater than 1.";
+                    this.sendMessage("GRID UNITS: please enter a number greater than 1.");
+                    numberOfGridUnits.Background = new SolidColorBrush(Color.FromArgb(255,255,95,95));
+                    
+                }
+                else
+                {
+                    message.Text = "";
+                    numberOfGridUnits.Background = new SolidColorBrush(Colors.White);
+                    gridSettings.gridUnits = newGridUnits;
+                }
+
             }
             catch (Exception ex) {}
 
         }
 
+        private void sendMessage(String msg)
+        {
+            message.Text = msg;
+        }
+
         private void setGridUnits_Click(object sender, RoutedEventArgs e)
         {
-            if (CCWRotation.IsChecked == true)
-            {
-                gridSetup.setGridUnits(gridSetup.gridUnits, -1);
-            }
-            else if (CWRotation.IsChecked == true)
-            {
-                gridSetup.setGridUnits(gridSetup.gridUnits, 1);
-            }
-            else
-            {
-                gridSetup.setGridUnits(gridSetup.gridUnits, 0);
-            }
+            gridSettings.setGridUnits(gridSettings.gridUnits, gridSettings.rotation);
             updateGrid();
         }
 
@@ -251,7 +367,7 @@ namespace SkeletalTracking
         {
             try
             {
-                MainWindow.SmoothSkeleton.setM(Convert.ToDouble(mBox.Text));
+                this.SmoothSkeleton.setM(Convert.ToDouble(mBox.Text));
             }
             catch (FormatException ex) { }
 
@@ -275,40 +391,64 @@ namespace SkeletalTracking
             catch (FormatException ex) { }
         }
 
-        private void rotate_Checked(object sender, RoutedEventArgs e)
+        
+
+        
+
+        private void CWRotation_Checked(object sender, RoutedEventArgs e)
         {
-            
+            // change color window size
             colorWindow.SetValue(WidthProperty, SystemParameters.VirtualScreenWidth);
+            colorWindow.SetValue(HeightProperty, SystemParameters.VirtualScreenHeight);
+            // change grid size
+            this.gridSettings.resize(SystemParameters.VirtualScreenWidth, SystemParameters.VirtualScreenHeight, 1);
+            updateGrid();
         }
 
-        private void rotate_Unchecked(object sender, RoutedEventArgs e)
+        private void devRotation_Checked(object sender, RoutedEventArgs e)
         {
-            double testWidth = 800;
-            colorWindow.SetValue(WidthProperty, testWidth);
-            
-            
+            colorWindow.SetValue(WidthProperty, dev_ColorWindowWidth );
+            colorWindow.SetValue(HeightProperty, dev_ColorWindowHeight);
+            if (gridSettings != null)
+            {
+                this.gridSettings.resize(dev_ColorWindowWidth, dev_ColorWindowHeight, 0);
+                updateGrid();
+            }
         }
 
-        private void button1_Click(object sender, RoutedEventArgs e)
+        private void CCWRotation_Checked(object sender, RoutedEventArgs e)
         {
-            colorWindow.updateGrid(this.gridSetup.lines);
+            colorWindow.SetValue(WidthProperty, SystemParameters.VirtualScreenWidth);
+            colorWindow.SetValue(HeightProperty, SystemParameters.VirtualScreenHeight);
+            this.gridSettings.resize(SystemParameters.VirtualScreenWidth, SystemParameters.VirtualScreenHeight, -1);
+            updateGrid();
+        }
+
+        public void setTilt(int angle)
+        {
+            if (nui.NuiCamera.TrySetAngle(angle))
+                sendMessage("Moving the sensor...");
+            else
+                sendMessage("Error occurred moving the sensor.");
+
+
         }
        
     }
 
-    public class GridSetup
+    public class GridSettings
     {
         
         int gapSize;                 // crosshair height: 100
         DoubleCollection lineStyle;
         public int gridUnits;
-        double gridWidth;
-        double gridHeight;
-        int rotation;
+        public int rotation;
+        public double gridWidth;
+        public double gridHeight;
         public System.Collections.ArrayList lines;
 
 
-        public GridSetup(double windowHeight, double windowWidth)
+        public GridSettings(double windowWidth, double windowHeight)
         {
             
             
@@ -326,18 +466,19 @@ namespace SkeletalTracking
 
         }
 
-        public void resize(int windowHeight, int windowWidth, int rotation)
+        public void resize(double windowWidth, double windowHeight, int rotation)
         {
             gridHeight = windowHeight;
             gridWidth = windowWidth;
             setGridUnits(gridUnits, rotation);
-
         }
+        
 
-        // 90deg counter-clockwise, rotation = -1
-        // 0deg, developer screen, rotation = 0
-        // 90deg, clockwise, rotation = 1
-        // gridUnits: number of vertical squares that the crosshairs will move through
+        /// <summary>
+        /// puts new grid lines into (Arraylist lines) according to grid unit and rotation (parameters), gap size, and the size of the color window (specified in gridSetup). a call to setGridUnits is usually followed by a call to updateGrid().
+        /// </summary>
+        /// <param name="gridUnits">number of units between top and bottom lines (what the crosshairs move through)</param>
+        /// <param name="rotation">0 = developer; 1 = 90deg clockwise, -1 = 90deg counterclockwise</param>
         public void setGridUnits(int gridUnits, int rotation)
         {
             lines.Clear();
@@ -345,7 +486,7 @@ namespace SkeletalTracking
             this.gridUnits = gridUnits;
             this.rotation = rotation;
 
-            // gridsize: pixel height of one box
+            // gridsize: pixel length of a side of one square
             int gridSize = 0;
             if (rotation == 0)
             {
@@ -483,7 +624,349 @@ namespace SkeletalTracking
 
         }
     }
+
+    public class ToleranceSettings
+    {
+        // tolerance:
+        // true = relative tolerance
+        // false = absolute tolerance
+        bool toleranceMode;
+        double maxHandPosition;
+        double maxTolerance;
+        double minTolerance;
+        double toleranceLeftHand;
+        double toleranceRightHand;
+
+        //Kinect Runtime
+        double leftHandRatio;
+        double rightHandRatio;
+
+        double proportion;
+        double tolerance;
+        double greenYellowFade;
+        double yellowRedFade;
+
+        public ToleranceSettings()
+        {
+            // relative or absolute tolerance?
+            toleranceMode = false;
+            maxTolerance = 0;
+            minTolerance = 0;
+            
+            // these are constrained
+            leftHandRatio = 1;
+            rightHandRatio = 1;
+            proportion = 1;
+            
+            tolerance = .1;
+            greenYellowFade = .01;
+            yellowRedFade = .01;
+        }
+
+        public void setToleranceMode(bool mode)
+        {
+            toleranceMode = mode;
+        }
+        public void setMinTolerance(int minT)
+        {
+            minTolerance = minT;
+        }
+        public void setMaxTolerance(int maxT)
+        {
+            maxTolerance = maxT;
+        }
+        public void setTolerance(int toleranceValue)
+        {
+            if (toleranceValue <= 50 && toleranceValue >= 0)
+            {
+
+                tolerance = (double)toleranceValue / 100;
+            }
+        }
+        public void changeLeftHandValue(double leftValue)
+        {
+            leftHandRatio = leftValue;
+            recalculateProportion();
+        }
+
+        public void changeRightHandValue(double rightValue)
+        {
+            rightHandRatio = rightValue;
+            recalculateProportion();
+        }
+
+        private void recalculateProportion()
+        {
+            proportion = leftHandRatio / rightHandRatio;
+        }
+
+
+
+        class ColorInterpolator
+        {
+            delegate byte ComponentSelector(System.Windows.Media.Color color);
+            static ComponentSelector _redSelector = color => color.R;
+            static ComponentSelector _greenSelector = color => color.G;
+            static ComponentSelector _blueSelector = color => color.B;
+
+            public static System.Windows.Media.Color InterpolateBetween(
+                System.Windows.Media.Color endPoint1,
+                System.Windows.Media.Color endPoint2,
+                double lambda)
+            {
+                if (lambda < 0 || lambda > 1)
+                {
+                    throw new ArgumentOutOfRangeException("lambda");
+                }
+                System.Windows.Media.Color color = System.Windows.Media.Color.FromArgb(
+                    255,
+                    InterpolateComponent(endPoint1, endPoint2, lambda, _redSelector),
+                    InterpolateComponent(endPoint1, endPoint2, lambda, _greenSelector),
+                    InterpolateComponent(endPoint1, endPoint2, lambda, _blueSelector)
+                );
+
+                return color;
+            }
+
+            static byte InterpolateComponent(
+                System.Windows.Media.Color endPoint1,
+                System.Windows.Media.Color endPoint2,
+                double lambda,
+                ComponentSelector selector)
+            {
+                // redComponent(endPoint1) + lambda*difference between endPoints
+                return (byte)(selector(endPoint1)
+                    + (selector(endPoint2) - selector(endPoint1)) 
+                    * lambda);
+            }
+        }
+
+    }
+
+    public class SmoothSkeleton
+    {
+
+        //double jitterRegion = 5;
+        static bool smoothingEnabled = true;
+        static double trendSmoothingRate = 0.1;
+        static double dataSmoothingRate = 0.2;
+        static double m = 1;                          // play with this value 
+        // (it's like prediction)
+        double leftCurrentPos;
+        double leftPrevPos;
+        double leftCurrentSmooth;
+        double leftPrevSmooth;
+        double leftCurrentTrendSmooth;
+        double leftPrevTrendSmooth;
+
+        double rightCurrentPos;
+        double rightPrevPos;
+        double rightCurrentSmooth;
+        double rightPrevSmooth;
+        double rightCurrentTrendSmooth;
+        double rightPrevTrendSmooth;
+
+        public double leftOutput;
+        public double rightOutput;
+
+
+        public static void setTrendSmoothingRate(double newRate)
+        {
+            trendSmoothingRate = newRate;
+        }
+        public static void setDataSmoothingRate(double newRate)
+        {
+            dataSmoothingRate = newRate;
+        }
+        public static void setM(double newM)
+        {
+            m = newM;
+        }
+
+        public SmoothSkeleton()
+        {
+        }
+
+        public SmoothSkeleton(double leftHandY, double rightHandY)
+        {
+            leftCurrentPos = leftHandY;
+            leftCurrentSmooth = leftHandY;
+            leftCurrentTrendSmooth = 0;         // ?????
+
+            rightCurrentSmooth = rightHandY;
+
+            leftOutput = leftHandY;
+            rightOutput = rightHandY;
+
+        }
+
+        public void update(double newLeft, double newRight)
+        {
+            // LEFT HAND
+            if (smoothingEnabled == true)
+            {
+                // jitterReduce section
+                //if (Math.Abs(leftCurrentPos - leftPrevPos) > jitterRegion) {
+                //    leftCurrentPos = leftPrevPos;
+                //}
+                //if (Math.Abs(rightCurrentPos - rightPrevPos) > jitterRegion) {
+                //    rightCurrentPos = rightPrevPos;
+                //}
+
+                //
+
+                leftPrevPos = leftCurrentPos;
+                leftPrevSmooth = leftCurrentSmooth;
+                leftPrevTrendSmooth = leftCurrentTrendSmooth;
+
+                leftCurrentPos = newLeft;
+
+                leftCurrentSmooth =
+                    (dataSmoothingRate * leftCurrentPos)
+                    + (1 - dataSmoothingRate) * (leftPrevSmooth + leftPrevTrendSmooth);
+
+                // is this happening AFTER the previous line? possible race condition.
+                // change right hand value too.
+                leftCurrentTrendSmooth =
+                    trendSmoothingRate * (leftCurrentSmooth - leftPrevSmooth)
+                    + (1 - trendSmoothingRate) * leftPrevTrendSmooth;
+
+                leftOutput = leftCurrentSmooth + (m * leftCurrentTrendSmooth);
+
+
+                // RIGHT HAND
+                rightPrevPos = rightCurrentPos;
+                rightPrevSmooth = rightCurrentSmooth;
+                rightPrevTrendSmooth = rightCurrentTrendSmooth;
+
+                rightCurrentPos = newRight;
+
+                rightCurrentSmooth =
+                    (dataSmoothingRate * rightCurrentPos)
+                    + (1 - dataSmoothingRate) * (rightPrevSmooth + rightPrevTrendSmooth);
+
+                rightCurrentTrendSmooth =
+                    trendSmoothingRate * (rightCurrentSmooth - rightPrevSmooth)
+                    + (1 - trendSmoothingRate) * rightPrevTrendSmooth;
+
+                rightOutput = rightCurrentSmooth + (m * rightCurrentTrendSmooth);
+            }
+            else
+            {
+                leftOutput = newLeft;
+                rightOutput = newRight;
+            }
+        }
+    }
+
+    public class CalibrationSettings
+    {
+        bool inCalibrationMode;
+        double crosshairRate;
+        double calibrationBaseline;
+        bool isCalibrated;
+
+        public CalibrationSettings()
+        {
+            inCalibrationMode = false;
+            calibrationBaseline = 0;
+            crosshairRate = 1;  // should start as 0?
+            isCalibrated = false;
+        }
+
+        public void setCalibrationMode(bool value)
+        {
+            if (!inCalibrationMode)
+            {
+                inCalibrationMode = value;
+            }
+        }
+        /*
+        public void callCalibrate()
+        {
+            calibrate(skeleton);
+        }
+        */
+        public bool checkForSkeleton(SkeletonData skeleton)
+        {
+            if (skeleton == null)
+            {
+
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+
+        // sets a calibration baseline
+        public string calibrate(SkeletonData skeleton)
+        {
+            // reset isCalibrated
+            if (isCalibrated == true)
+            {
+                isCalibrated = false;
+            }
+
+            // isCalibrated is false at this point
+            // only attempt to calibrate if skeleton is not null
+            if (checkForSkeleton(skeleton) == false)
+            {
+                return "person not recognized";
+            }
+            else
+            {
+                while (!isCalibrated)
+                {
+                    var scaledLeftHand = skeleton.Joints[JointID.HandLeft].ScaleTo(640, 480, .5f, .5f);
+                    var scaledRightHand = skeleton.Joints[JointID.HandRight].ScaleTo(640, 480, .5f, .5f);
+                    double leftHandCalibrationValue = scaledLeftHand.Position.Y;
+                    double rightHandCalibrationValue = scaledRightHand.Position.Y;
+
+
+
+                    if (leftHandCalibrationValue < rightHandCalibrationValue)
+                    {
+                        calibrationBaseline = leftHandCalibrationValue;
+                    }
+                    else
+                    {
+                        calibrationBaseline = rightHandCalibrationValue;
+                    }
+                    // correct???????? should this be in colorWindow?
+                    crosshairRate = (SystemParameters.VirtualScreenHeight / -calibrationBaseline) * 0.9;
+
+                    if (calibrationBaseline > 0)
+                    {
+                        isCalibrated = true;
+                    }
+                }
+
+                return "calibrated!";
+            }
+        }
+    }
         
     
+}
+
+namespace Kinect.Extensions
+{
+    public static class CameraExtensions
+    {
+        public static bool TrySetAngle(this Camera camera, int angle)
+        {
+            try
+            {
+                camera.ElevationAngle = angle;
+                return true;
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+        }
+    }
 }
 

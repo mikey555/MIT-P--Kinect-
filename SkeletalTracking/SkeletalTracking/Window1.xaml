@@ -28,7 +28,7 @@
         <TextBox Height="23" HorizontalAlignment="Right" Margin="0,50,451,0" Name="maxToleranceBox" VerticalAlignment="Top" Width="46" Text="10" />
         <Button Content="Set" Height="23" HorizontalAlignment="Left" Margin="225,50,0,0" Name="setToleranceRange" VerticalAlignment="Top" Width="33" Click="setToleranceRange_Click" IsEnabled="True" />
         <CheckBox Content="Hide Ratio Value" Height="16" HorizontalAlignment="Left" Margin="146,215,0,0" Name="HideRatioValueCheckbox" VerticalAlignment="Top" Checked="HideRatioValueCheckbox_Checked" Unchecked="HideRatioValueCheckbox_Unchecked" IsThreeState="False" IsChecked="True" />
-        <TextBox Height="23" HorizontalAlignment="Left" Margin="279,229,0,0" Name="numberOfGridUnits" VerticalAlignment="Top" Width="33" Text="10" TextChanged="numberOfGridUnits_TextChanged" />
+        <TextBox Height="23" HorizontalAlignment="Left" Margin="279,229,0,0" Name="numberOfGridUnits" VerticalAlignment="Top" Width="33" Text="10" TextChanged="numberOfGridUnits_TextChanged" Background="White" />
         <Button Content="Set Grid Units" Height="23" HorizontalAlignment="Left" Margin="318,229,0,0" Name="setGridUnits" VerticalAlignment="Top" Width="70" FontSize="10" FontStretch="Condensed" Click="setGridUnits_Click" />
         <CheckBox Content="Enable Grid Units" Height="16" HorizontalAlignment="Left" Margin="279,207,0,0" Name="GridUnitsCheckBox" VerticalAlignment="Top" Checked="GridUnitsCheckBox_Checked" Unchecked="GridUnitsCheckBox_Unchecked" IsChecked="True" />
         <TextBlock Height="23" HorizontalAlignment="Left" Margin="297,77,0,0" Name="textBlock5" Text="m" VerticalAlignment="Top" />
@@ -37,10 +37,9 @@
         <TextBox Height="23" HorizontalAlignment="Left" Margin="354,77,0,0" Name="mBox" VerticalAlignment="Top" Width="65" TextChanged="mBox_TextChanged" Text="1" />
         <TextBox Height="23" HorizontalAlignment="Left" Margin="354,106,0,0" Name="trendRateBox" VerticalAlignment="Top" Width="65" TextChanged="trendRateBox_TextChanged" Text=".1" />
         <TextBox Height="23" HorizontalAlignment="Left" Margin="354,133,0,0" Name="dataRateBox" VerticalAlignment="Top" Width="65" TextChanged="dataRateBox_TextChanged" Text=".2" />
-        <CheckBox Content="Rotated Mode" Height="16" HorizontalAlignment="Left" Margin="514,87,0,0" Name="rotate" VerticalAlignment="Top" Checked="rotate_Checked" Unchecked="rotate_Unchecked" IsChecked="False" />
-        <RadioButton Content="Dev" Height="16" HorizontalAlignment="Left" Margin="404,215,0,0" Name="devRotation" VerticalAlignment="Top" GroupName="rotation" IsChecked="True" />
-        <RadioButton Content="CW" Height="16" HorizontalAlignment="Left" Margin="404,237,0,0" Name="CWRotation" VerticalAlignment="Top" GroupName="rotation" IsChecked="False" />
-        <RadioButton Content="CCW" Height="16" HorizontalAlignment="Left" Margin="404,193,0,0" Name="CCWRotation" VerticalAlignment="Top" GroupName="rotation" IsChecked="False" />
-        <Button Content="Button" Height="23" HorizontalAlignment="Left" Margin="386,28,0,0" Name="button1" VerticalAlignment="Top" Width="75" Click="button1_Click" />
+        <RadioButton Content="Dev" Height="16" HorizontalAlignment="Left" Margin="404,215,0,0" Name="devRotation" VerticalAlignment="Top" GroupName="rotation" IsChecked="True" Checked="devRotation_Checked" />
+        <RadioButton Content="CW" Height="16" HorizontalAlignment="Left" Margin="404,237,0,0" Name="CWRotation" VerticalAlignment="Top" GroupName="rotation" IsChecked="False" Checked="CWRotation_Checked" />
+        <RadioButton Content="CCW" Height="16" HorizontalAlignment="Left" Margin="404,193,0,0" Name="CCWRotation" VerticalAlignment="Top" GroupName="rotation" IsChecked="False" Checked="CCWRotation_Checked" />
+        <TextBlock Height="29" HorizontalAlignment="Left" Margin="12,12,0,0" Name="message" Text="" VerticalAlignment="Top" Width="464" FontSize="13" />
     </Grid>
 </Window>
