@@ -1,7 +1,11 @@
 ﻿<Window x:Class="SkeletalTracking.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="MainWindow" Closed="Window_Closed" Loaded="Window_Loaded" WindowState="Normal" WindowStyle="None" xmlns:my="clr-namespace:System;assembly=mscorlib" AllowsTransparency="False" Opacity="50" BorderBrush="Black" OpacityMask="#FF000032" mc:Ignorable="d" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+        Title="MainWindow" 
+
+        
+        WindowState="Normal" WindowStyle="None" 
+        xmlns:my="clr-namespace:System;assembly=mscorlib" AllowsTransparency="False" Opacity="50" BorderBrush="Black" OpacityMask="#FF000032" mc:Ignorable="d" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
         Height="1050"
         Width="800"
         DataContext="{Binding}" Left="0" Top="0">

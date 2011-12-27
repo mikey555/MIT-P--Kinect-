@@ -37,33 +37,30 @@ namespace SkeletalTracking
         public static MainWindow colorWindow;
         GridSettings gridSettings;
         ToleranceSettings toleranceSettings;
+        CalibrationSettings calibrationSettings;
+
         SmoothSkeleton smoothSkeleton; // what should this be called???
         SkeletonData skeleton;          // the current skeleton
-        CalibrationSettings calibrationSettings;
+        
         Runtime nui;
         
         public Window1()
         {
-            
-            
             colorWindow = new MainWindow();
+            nui = Runtime.Kinects[0];
+            nui.Initialize(RuntimeOptions.UseColor);
+            nui.NuiCamera.ElevationAngle = 0;
             
-            InitializeComponent();
-            
-
             // initialize grid
             gridSettings = new GridSettings(colorWindow.Width, colorWindow.Height);
             toleranceSettings = new ToleranceSettings();
-            smoothSkeleton = new SmoothSkeleton();
             calibrationSettings = new CalibrationSettings();
+
+            smoothSkeleton = new SmoothSkeleton();
+            
             this.updateGrid();
-
-
-
+            InitializeComponent();
             colorWindow.Show();
-            
-            
-
         }
 
         public void updateGrid() {
@@ -125,54 +122,70 @@ namespace SkeletalTracking
             nui.Uninitialize();
         }
 
-        
+
         void nui_SkeletonFrameReady(object sender, SkeletonFrameReadyEventArgs e)
         {
 
             SkeletonFrame allSkeletons = e.SkeletonFrame;
             // allSkeletons is not null iff allSkeletons has a skeleton?
-            skeleton = (from s in allSkeletons.Skeletons
-                        where s.TrackingState == SkeletonTrackingState.Tracked
-                        select s).FirstOrDefault();
-
-            if (skeleton != null)
+            if (allSkeletons != null)
             {
-                var leftHandY = skeleton.Joints[JointID.HandLeft].ScaleTo(dev_scaledKinectWidth, dev_scaledKinectHeight, .5f, .5f).Position.Y;
-                var rightHandY = skeleton.Joints[JointID.HandRight].ScaleTo(dev_scaledKinectWidth, dev_scaledKinectHeight, .5f, .5f).Position.Y;
+                skeleton = (from s in allSkeletons.Skeletons
+                            where s.TrackingState == SkeletonTrackingState.Tracked
+                            select s).FirstOrDefault();
 
-
-                if (allSkeletons.FrameNumber % 1 == 0)              // how many skeletons/second should be looked at and smoothed?
+                if (skeleton != null)
                 {
-                    // initial skeleton
-                    if (smoothSkeleton == null)
-                    {
-                        smoothSkeleton = new SmoothSkeleton(leftHandY, rightHandY);
-                    }
-                    // process every new skeleton
-                    else
-                    {
-                        smoothSkeleton.update(leftHandY, rightHandY);
-                    }
+                    var leftHandY = skeleton.Joints[JointID.HandLeft].ScaleTo(dev_scaledKinectWidth, dev_scaledKinectHeight, .5f, .5f).Position.Y;
+                    var rightHandY = skeleton.Joints[JointID.HandRight].ScaleTo(dev_scaledKinectWidth, dev_scaledKinectHeight, .5f, .5f).Position.Y;
 
-                    // 
-                    // Console.Write(allSkeletons.FrameNumber + " " + allSkeletons.TimeStamp + " ");
 
-                    // set background color
-                    SetColor(proportion, smoothSkeleton);
+                    if (allSkeletons.FrameNumber % 1 == 0)              // how many skeletons/second should be looked at and smoothed?
+                    {
+                        // initial skeleton
+                        if (smoothSkeleton == null)
+                        {
+                            smoothSkeleton = new SmoothSkeleton(leftHandY, rightHandY);
+                        }
+                        // process every new skeleton
+                        else
+                        {
+                            smoothSkeleton.update(leftHandY, rightHandY);
+                        }
+
+                        // 
+                        // Console.Write(allSkeletons.FrameNumber + " " + allSkeletons.TimeStamp + " ");
+
+                        // set background color
+                        //SetColor(proportion, smoothSkeleton);
+                        colorWindow.changeColor(toleranceSettings.getCurrentColor(smoothSkeleton));
+                    }
                 }
+                //}
             }
-            //}
         }
 
 
         private void slider1_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            colorWindow.changeLeftHandValue(leftHandSlider.Value);
+            try
+            {
+                toleranceSettings.changeLeftHandValue(leftHandSlider.Value);
+            }
+            catch (NullReferenceException ex) 
+            {
+            }
         }
 
         private void slider2_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            colorWindow.changeRightHandValue(rightHandSlider.Value);
+            try
+            {
+                toleranceSettings.changeRightHandValue(rightHandSlider.Value);
+            }
+            catch (NullReferenceException ex)
+            {
+            }
         }
 
         //private void rightOverLeft_Checked(object sender, RoutedEventArgs e)
@@ -204,7 +217,7 @@ namespace SkeletalTracking
                 calibrateButton.SetValue(IsEnabledProperty, false);
                 calibrationSettings.setCalibrationMode(true);
                 
-                calibrationSettings.callCalibrate();
+                calibrationSettings.calibrate(skeleton);
                 
                 calibrateButton.SetValue(IsEnabledProperty, true);
                 calibrateButton.Content = "Calibrate";
@@ -258,18 +271,6 @@ namespace SkeletalTracking
                 int value = Int32.Parse(textBox1.Text);
                 toleranceSettings.setTolerance(value);
             }
-        }
-
-   
-
-        private void tiltSlider_ValueChanged_1(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            tiltValue = Convert.ToInt32(tiltSlider.Value);
-        }
-
-        private void setTiltButton_Click(object sender, RoutedEventArgs e)
-        {
-            this.setTilt(tiltValue);
         }
 
         private void toleranceOption1_Checked(object sender, RoutedEventArgs e)
@@ -346,8 +347,6 @@ namespace SkeletalTracking
             colorWindow.hideGridUnits();
         }
 
-        
-
         private void mSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             
@@ -367,7 +366,7 @@ namespace SkeletalTracking
         {
             try
             {
-                this.SmoothSkeleton.setM(Convert.ToDouble(mBox.Text));
+                SmoothSkeleton.setM(Convert.ToDouble(mBox.Text));
             }
             catch (FormatException ex) { }
 
@@ -377,7 +376,7 @@ namespace SkeletalTracking
         {
             try
             {
-                MainWindow.SmoothSkeleton.setTrendSmoothingRate(Convert.ToDouble(trendRateBox.Text));
+                SmoothSkeleton.setTrendSmoothingRate(Convert.ToDouble(trendRateBox.Text));
             }
             catch (FormatException ex) { }
         }
@@ -386,14 +385,10 @@ namespace SkeletalTracking
         {
             try
             {
-                MainWindow.SmoothSkeleton.setDataSmoothingRate(Convert.ToDouble(dataRateBox.Text));
+                SmoothSkeleton.setDataSmoothingRate(Convert.ToDouble(dataRateBox.Text));
             }
             catch (FormatException ex) { }
         }
-
-        
-
-        
 
         private void CWRotation_Checked(object sender, RoutedEventArgs e)
         {
@@ -424,6 +419,7 @@ namespace SkeletalTracking
             updateGrid();
         }
 
+        // tilt
         public void setTilt(int angle)
         {
             if (nui.NuiCamera.TrySetAngle(angle))
@@ -432,6 +428,16 @@ namespace SkeletalTracking
                 sendMessage("Error occurred moving the sensor.");
 
 
+        }
+
+        private void tiltSlider_ValueChanged_1(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            tiltValue = Convert.ToInt32(tiltSlider.Value);
+        }
+
+        private void setTiltButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.setTilt(tiltValue);
         }
        
     }
@@ -646,6 +652,19 @@ namespace SkeletalTracking
         double greenYellowFade;
         double yellowRedFade;
 
+        // gradient points
+        double bottomTolerance;
+        double topTolerance;
+        double topYellow;
+        double bottomYellow;
+        double topRed;
+        double bottomRed;
+
+        double arrayPrecision;
+        SolidColorBrush[] brushArray;
+        SolidColorBrush greenBrush = new SolidColorBrush(Colors.Green);
+        SolidColorBrush redBrush = new SolidColorBrush(Colors.Red);
+
         public ToleranceSettings()
         {
             // relative or absolute tolerance?
@@ -661,6 +680,32 @@ namespace SkeletalTracking
             tolerance = .1;
             greenYellowFade = .01;
             yellowRedFade = .01;
+
+            recalculateGradientPoints();
+            createColorArray();
+
+            arrayPrecision = .001;
+        }
+
+        private void updateToleranceSettings()
+        {
+            recalculateProportion();
+            recalculateGradientPoints();
+            createColorArray();
+        }
+
+        /// <summary>
+        /// sets interpolation boundaries. e.g., bottomTolerance and topTolerance are 1.9 and 2.1 when proportion = 2 and tolerance = 0.1.
+        /// bottomRed, bottomYellow, bottomTolerance (green) are points on the proportion spectrum BELOW the secret proportion where solid colors will appear
+        /// </summary>
+        private void recalculateGradientPoints()
+        {
+            bottomTolerance = proportion - (tolerance * 1 / 2);
+            topTolerance = proportion + (tolerance * 1 / 2);
+            topYellow = proportion + (tolerance * 1 / 2) + greenYellowFade;
+            bottomYellow = proportion - (tolerance * 1 / 2) - greenYellowFade;
+            topRed = proportion + (tolerance * 1 / 2) + greenYellowFade + yellowRedFade;
+            bottomRed = proportion - (tolerance * 1 / 2) - greenYellowFade - yellowRedFade;
         }
 
         public void setToleranceMode(bool mode)
@@ -700,6 +745,82 @@ namespace SkeletalTracking
             proportion = leftHandRatio / rightHandRatio;
         }
 
+        private void createColorArray()
+        {
+            int arraySize = Convert.ToInt32((topRed - bottomRed) / arrayPrecision);
+            brushArray = new SolidColorBrush[arraySize];
+
+            int arrayIndex = 0;
+            int yellowRedFadeColors = Convert.ToInt32(yellowRedFade / arrayPrecision);
+            int greenYellowFadeColors = Convert.ToInt32(greenYellowFade / arrayPrecision);
+            int greenColors = Convert.ToInt32(tolerance / arrayPrecision);
+            
+            // red to yellow
+            for (double map = 0, index = arrayIndex; index < yellowRedFadeColors; map += (arrayPrecision/yellowRedFade), index++)
+            {
+                Color color = ColorInterpolator.InterpolateBetween(Colors.Red, Colors.Yellow, map);
+                arrayIndex = Convert.ToInt32(index);
+                SolidColorBrush newBrush = new SolidColorBrush(color);
+                brushArray[arrayIndex] = newBrush;
+                brushArray[arraySize - arrayIndex - 1] = newBrush;
+            }
+            // at this point, arrayIndex = yellowRedFadeColors
+           
+            // yellow to green
+            for (double map = 0, index = arrayIndex; index < yellowRedFadeColors + greenYellowFadeColors; map += (arrayPrecision / greenYellowFade), index++)
+            {
+                Color color = ColorInterpolator.InterpolateBetween(Colors.Yellow, Colors.Green, map);
+                arrayIndex = Convert.ToInt32(index);
+                SolidColorBrush newBrush = new SolidColorBrush(color);
+                brushArray[arrayIndex] = newBrush;
+                brushArray[arraySize - arrayIndex - 1] = newBrush;
+            }
+            // at this point, arrayIndex = yellowRedFadeColors + greenYellowFadeColors
+            
+            // half of green
+            
+            for (double map = 0, index = arrayIndex; index < yellowRedFadeColors + greenYellowFadeColors + greenColors; map += (arrayPrecision / greenYellowFade), index++)
+            {
+                arrayIndex = Convert.ToInt32(index);
+                brushArray[arrayIndex] = greenBrush;
+            }
+        }
+
+        
+        public SolidColorBrush getCurrentColor(SmoothSkeleton skeleton)
+        {
+            // top of screen = 0
+            // bottom of screen = 480
+            double leftHandPosition = skeleton.leftOutput;
+            double rightHandPosition = skeleton.rightOutput;
+
+            double calibratedLeftHandPosition = leftHandPosition - CalibrationSettings.calibrationBaseline ;
+
+            double calibratedRightHandPosition = rightHandPosition - CalibrationSettings.calibrationBaseline;
+            if (calibratedRightHandPosition == 0)
+            {
+                calibratedRightHandPosition += .0001;
+            }
+
+            // SET THE CROSSHAIRS
+
+            double currentProportion = calibratedLeftHandPosition / calibratedRightHandPosition;
+
+            // implement relative tolerance
+
+            // display current proportion
+
+            if (currentProportion < bottomRed || currentProportion > topRed)
+            {
+                return redBrush;
+            }
+            else
+            {
+                int index = Convert.ToInt32((currentProportion - bottomRed) * (1 / arrayPrecision));
+                return brushArray[index];
+            }
+
+        }
 
 
         class ColorInterpolator
@@ -863,7 +984,7 @@ namespace SkeletalTracking
     {
         bool inCalibrationMode;
         double crosshairRate;
-        double calibrationBaseline;
+        public static double calibrationBaseline;
         bool isCalibrated;
 
         public CalibrationSettings()
@@ -901,6 +1022,7 @@ namespace SkeletalTracking
         }
 
         // sets a calibration baseline
+        // TODO: parameter should be smoothSkeleton
         public string calibrate(SkeletonData skeleton)
         {
             // reset isCalibrated

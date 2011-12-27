@@ -82,7 +82,10 @@ namespace SkeletalTracking
 
 
 
-
+        public void changeColor (SolidColorBrush brush) 
+        {
+            MainCanvas.Background = brush;
+        }
 
 
 
@@ -368,7 +371,7 @@ namespace SkeletalTracking
     */
 
 
-
+        /*
 
         /// <summary>
         /// set crosshair positions
@@ -380,14 +383,14 @@ namespace SkeletalTracking
         /// <param name="skeleton">the current SmoothSkeleton</param>
         private void SetColor(double setProportion, SmoothSkeleton skeleton)
         {
-
+            
 
             // top of screen = 0
             // bottom of screen = 480
             double leftHandPosition = skeleton.leftOutput;
             double rightHandPosition = skeleton.rightOutput;
 
-
+            
 
             crosshair1.SetValue(Canvas.BottomProperty, Math.Min(0, leftHandPosition - calibrationBaseline) * crosshairRate);
             crosshair2.SetValue(Canvas.BottomProperty, Math.Min(0, rightHandPosition - calibrationBaseline) * crosshairRate);
@@ -428,7 +431,7 @@ namespace SkeletalTracking
             // display heights
             textBlock1.Text = currentProportion.ToString();
 
-            // determine gradient points
+            // gradient points
             double bottomTolerance = setProportion - (tolerance * 1/2);
             double topTolerance = setProportion + (tolerance * 1/2);
             double topYellow = setProportion + (tolerance * 1/2) + greenYellowFade;
@@ -489,6 +492,8 @@ namespace SkeletalTracking
 
             MainCanvas.Background = interpolatedColorBrush;      // set Background to a colorString, e.g. "#113355FF"
         }
+         */
+
         /*
         private void Window_Closed(object sender, EventArgs e)
         {

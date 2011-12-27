@@ -1,6 +1,8 @@
 ﻿<Window x:Class="SkeletalTracking.Window1"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Loaded="Window_Loaded"
+        Closed="Window_Closed"
         Title="Window1" Height="303" Width="692" Left="900">
     <Grid>
         <Slider Height="95" HorizontalAlignment="Left" Margin="35,136,0,0" Name="leftHandSlider" VerticalAlignment="Top" Width="22" Orientation="Vertical" Interval="1" Delay="100" Ticks="1,2,3,4,5,6,7,8,9,10" Minimum="1" Maximum="10" Value="1" AutoToolTipPlacement="TopLeft" ValueChanged="slider1_ValueChanged" IsSnapToTickEnabled="True" />
