@@ -30,8 +30,8 @@ namespace SkeletalTracking
         // Developer Options
         const double dev_ColorWindowHeight = 1050;
         const double dev_ColorWindowWidth = 800;
-        const int dev_scaledKinectWidth = 640;
-        const int dev_scaledKinectHeight = 480;
+        const int dev_scaledDepthCamWidth = 640;
+        const int dev_scaledDepthCamHeight = 480;
         
         // public static MainWindow colorWindow = new MainWindow();
         public static MainWindow colorWindow;
@@ -136,8 +136,9 @@ namespace SkeletalTracking
 
                 if (skeleton != null)
                 {
-                    var leftHandY = skeleton.Joints[JointID.HandLeft].ScaleTo(dev_scaledKinectWidth, dev_scaledKinectHeight, .5f, .5f).Position.Y;
-                    var rightHandY = skeleton.Joints[JointID.HandRight].ScaleTo(dev_scaledKinectWidth, dev_scaledKinectHeight, .5f, .5f).Position.Y;
+                    // unsmoothed y-values
+                    var leftHandY = skeleton.Joints[JointID.HandLeft].ScaleTo(dev_scaledDepthCamWidth, dev_scaledDepthCamHeight, .5f, .5f).Position.Y;
+                    var rightHandY = skeleton.Joints[JointID.HandRight].ScaleTo(dev_scaledDepthCamWidth, dev_scaledDepthCamHeight, .5f, .5f).Position.Y;
 
 
                     if (allSkeletons.FrameNumber % 1 == 0)              // how many skeletons/second should be looked at and smoothed?
@@ -159,9 +160,10 @@ namespace SkeletalTracking
                         // set background color
                         //SetColor(proportion, smoothSkeleton);
                         colorWindow.changeColor(toleranceSettings.getCurrentColor(smoothSkeleton));
+                        if (CalibrationSettings.isCalibrated) 
+                            colorWindow.setCrosshairs(toleranceSettings.calibratedLeftHandPos, toleranceSettings.calibratedRightHandPos);
                     }
                 }
-                //}
             }
         }
 
@@ -235,8 +237,9 @@ namespace SkeletalTracking
                 // if success, it sets the calibration baseline.
                 sendMessage(calibrationSettings.calibrate(skeleton));
                 
-                //calibrateButton.SetValue(IsEnabledProperty, true);
-                //calibrateButton.Content = "Calibrate";
+                // changeCrosshairRate depends on the new calibration baseline
+                gridSettings.changeCrosshairRate();
+
                 enableCalibrateButton();
                 // restart countdown
                 countDown = 5;
@@ -266,12 +269,12 @@ namespace SkeletalTracking
 
         private void enableCrosshairs_Checked(object sender, RoutedEventArgs e)
         {
-            colorWindow.setCrosshairs();
+            colorWindow.enableCrosshairs();
         }
 
         private void enableCrosshairs_Unchecked(object sender, RoutedEventArgs e)
         {
-            colorWindow.setCrosshairs();
+            colorWindow.enableCrosshairs();
         }
 
         //private void toleranceSlider_ValueChanged_1(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -412,8 +415,10 @@ namespace SkeletalTracking
             colorWindow.SetValue(WidthProperty, SystemParameters.VirtualScreenWidth);
             colorWindow.SetValue(HeightProperty, SystemParameters.VirtualScreenHeight);
             // change grid size
+            colorWindow.changeRotationMode(1);
             this.gridSettings.resize(SystemParameters.VirtualScreenWidth, SystemParameters.VirtualScreenHeight, 1);
             updateGrid();
+            
         }
 
         private void devRotation_Checked(object sender, RoutedEventArgs e)
@@ -422,9 +427,11 @@ namespace SkeletalTracking
             colorWindow.SetValue(HeightProperty, dev_ColorWindowHeight);
             if (gridSettings != null)
             {
+                colorWindow.changeRotationMode(0);
                 this.gridSettings.resize(dev_ColorWindowWidth, dev_ColorWindowHeight, 0);
                 updateGrid();
             }
+            
         }
 
         private void CCWRotation_Checked(object sender, RoutedEventArgs e)
@@ -433,6 +440,7 @@ namespace SkeletalTracking
             colorWindow.SetValue(HeightProperty, SystemParameters.VirtualScreenHeight);
             this.gridSettings.resize(SystemParameters.VirtualScreenWidth, SystemParameters.VirtualScreenHeight, -1);
             updateGrid();
+            colorWindow.changeRotationMode(-1);
         }
 
         // tilt
@@ -455,37 +463,38 @@ namespace SkeletalTracking
         {
             this.setTilt(tiltValue);
         }
+
+        private void crosshairsStopAtBottom_Checked(object sender, RoutedEventArgs e)
+        {
+            GridSettings.crosshairsStopAtBottom = true;
+        }
+        private void crosshairsStopAtBottom_Unchecked(object sender, RoutedEventArgs e)
+        {
+            GridSettings.crosshairsStopAtBottom = false;
+        }
        
     }
 
     public class GridSettings
     {
-        
-        int gapSize;                 // crosshair height: 100
-        DoubleCollection lineStyle;
-        public int gridUnits;
-        public int rotation;
+
+        public static int gapSize = 50;                 // crosshair height: 100
+        DoubleCollection lineStyle = new DoubleCollection();
+        public int gridUnits = 10;
+        public int rotation = 0;
         public double gridWidth;
         public double gridHeight;
-        public System.Collections.ArrayList lines;
+        public System.Collections.ArrayList lines = new System.Collections.ArrayList();
+        public static double crosshairRate = 0;
+        public static bool crosshairsStopAtBottom;
+
 
 
         public GridSettings(double windowWidth, double windowHeight)
         {
-            
-            
             gridHeight = windowHeight;
             gridWidth = windowWidth;
-            lineStyle = new DoubleCollection();
-            gridUnits = 10;
-            gapSize = 50;
-            rotation = 0;
-            lines = new System.Collections.ArrayList();
-
-
             setGridUnits(gridUnits, rotation);
-
-
         }
 
         public void resize(double windowWidth, double windowHeight, int rotation)
@@ -493,6 +502,25 @@ namespace SkeletalTracking
             gridHeight = windowHeight;
             gridWidth = windowWidth;
             setGridUnits(gridUnits, rotation);
+            changeCrosshairRate();
+        }
+
+        public void changeCrosshairRate()
+        {
+            if(CalibrationSettings.isCalibrated) {
+                if (rotation == 0)
+                {
+                    //crosshairRate = (SystemParameters.VirtualScreenHeight / -calibrationBaseline) * 0.9;
+                    crosshairRate = (gridHeight / -CalibrationSettings.calibrationBaseline) * .95;
+                    
+                }
+                if (rotation == 1)
+                {
+                    //crosshairRate = (SystemParameters.VirtualScreenHeight / -calibrationBaseline) * 0.9;
+                    //crosshairRate = (gridWidth / -CalibrationSettings.calibrationBaseline) * .9;
+                }
+            }
+
         }
         
 
@@ -658,6 +686,8 @@ namespace SkeletalTracking
         double minTolerance;
         double toleranceLeftHand;
         double toleranceRightHand;
+        public double calibratedLeftHandPos;
+        public double calibratedRightHandPos;
 
         //Kinect Runtime
         double leftHandRatio;
@@ -693,14 +723,14 @@ namespace SkeletalTracking
             // these are constrained
             leftHandRatio = 1;
             rightHandRatio = 1;
-            proportion = 1.333; // can only have 2 decimal digits!!
+            proportion = 0.5; // can only have 2 decimal digits!!
             
             tolerance = .1;
             greenYellowFade = .01;
             yellowRedFade = .01;
 
             recalculateGradientPoints();
-            createColorArray();
+            //createColorArray();
 
             
         }
@@ -709,7 +739,7 @@ namespace SkeletalTracking
         {
             recalculateProportion();
             recalculateGradientPoints();
-            createColorArray();
+            //createColorArray();
         }
 
         /// <summary>
@@ -732,7 +762,7 @@ namespace SkeletalTracking
             topRed = Math.Round(topRed, 3);
             bottomRed = proportion - greenYellowFade - yellowRedFade - (tolerance / 2);
             bottomRed = Math.Round(bottomRed, 3);
-            //bottomRed = proportion - fadeDistance;
+            
         }
 
         public void setToleranceMode(bool mode)
@@ -823,32 +853,62 @@ namespace SkeletalTracking
             double leftHandPosition = skeleton.leftOutput;
             double rightHandPosition = skeleton.rightOutput;
 
-            double calibratedLeftHandPosition = leftHandPosition - CalibrationSettings.calibrationBaseline ;
-
-            double calibratedRightHandPosition = rightHandPosition - CalibrationSettings.calibrationBaseline;
-            if (calibratedRightHandPosition == 0)
+            calibratedLeftHandPos = -(leftHandPosition - CalibrationSettings.calibrationBaseline);
+            if (calibratedLeftHandPos == 0)
             {
-                calibratedRightHandPosition += .0001;
+                calibratedLeftHandPos += .0001;
+            }
+
+            calibratedRightHandPos = -(rightHandPosition - CalibrationSettings.calibrationBaseline);
+            if (calibratedRightHandPos == 0)
+            {
+                calibratedRightHandPos += .0001;
             }
 
             // SET THE CROSSHAIRS
+            
 
-            double currentProportion = Math.Round(calibratedLeftHandPosition / calibratedRightHandPosition, 3);
+            double currentProportion = Math.Round(calibratedLeftHandPos / calibratedRightHandPos, 3);
 
             // implement relative tolerance
 
             // display current proportion
+            
 
-            if (currentProportion < bottomRed || currentProportion > topRed)
+
+            if (currentProportion < topTolerance && currentProportion > bottomTolerance)
             {
-                return redBrush;
-            }
-            else
-            {
-                int index = Convert.ToInt32((currentProportion - bottomRed) * (1 / arrayPrecision)) - 1;
-                return brushArray[index];
+                return greenBrush;
             }
 
+            // bottom red -> yellow
+            else if (currentProportion > bottomRed && currentProportion < bottomYellow)
+            {
+                //int index = Convert.ToInt32((currentProportion - bottomRed) * (1 / arrayPrecision)) - 1;
+                //return brushArray[index];
+                double map = (1 / yellowRedFade) * (currentProportion - bottomRed);
+                return new SolidColorBrush(ColorInterpolator.InterpolateBetween(Colors.Red, Colors.Yellow, map));
+
+            }
+            // bottom yellow -> green
+            else if (currentProportion > bottomYellow && currentProportion < bottomTolerance)
+            {
+                double map = (1 / greenYellowFade) * (currentProportion - bottomYellow);
+                return new SolidColorBrush(ColorInterpolator.InterpolateBetween(Colors.Yellow, Colors.Green, map));
+            }
+            // top green -> yellow
+            else if (currentProportion > topTolerance && currentProportion < topYellow)
+            {
+                double map = (1 / greenYellowFade) * (currentProportion - topTolerance);
+                return new SolidColorBrush(ColorInterpolator.InterpolateBetween(Colors.Green, Colors.Yellow, map));
+            }
+            // top yellow -> red
+            else if (currentProportion > topYellow && currentProportion < topRed)
+            {
+                double map = (1 / yellowRedFade) * (currentProportion - topYellow);
+                return new SolidColorBrush(ColorInterpolator.InterpolateBetween(Colors.Yellow, Colors.Red, map));
+            }
+            else return redBrush;
         }
 
 
@@ -1012,15 +1072,13 @@ namespace SkeletalTracking
     public class CalibrationSettings
     {
         public static bool inCalibrationMode;
-        double crosshairRate;
         public static double calibrationBaseline;
-        bool isCalibrated;
+        public static bool isCalibrated;
 
         public CalibrationSettings()
         {
             inCalibrationMode = false;
             calibrationBaseline = 0;
-            crosshairRate = 1;  // should start as 0?
             isCalibrated = false;
         }
 
@@ -1086,8 +1144,6 @@ namespace SkeletalTracking
                     {
                         calibrationBaseline = rightHandCalibrationValue;
                     }
-                    // correct???????? should this be in colorWindow?
-                    crosshairRate = (SystemParameters.VirtualScreenHeight / -calibrationBaseline) * 0.9;
 
                     if (calibrationBaseline > 0)
                     {

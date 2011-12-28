@@ -41,7 +41,8 @@
         <TextBox Height="23" HorizontalAlignment="Left" Margin="354,133,0,0" Name="dataRateBox" VerticalAlignment="Top" Width="65" TextChanged="dataRateBox_TextChanged" Text=".2" />
         <RadioButton Content="Dev" Height="16" HorizontalAlignment="Left" Margin="404,215,0,0" Name="devRotation" VerticalAlignment="Top" GroupName="rotation" IsChecked="True" Checked="devRotation_Checked" />
         <RadioButton Content="CW" Height="16" HorizontalAlignment="Left" Margin="404,237,0,0" Name="CWRotation" VerticalAlignment="Top" GroupName="rotation" IsChecked="False" Checked="CWRotation_Checked" />
-        <RadioButton Content="CCW" Height="16" HorizontalAlignment="Left" Margin="404,193,0,0" Name="CCWRotation" VerticalAlignment="Top" GroupName="rotation" IsChecked="False" Checked="CCWRotation_Checked" />
+        <RadioButton Content="CCW" Height="16" HorizontalAlignment="Left" Margin="404,193,0,0" Name="CCWRotation" VerticalAlignment="Top" GroupName="rotation" IsChecked="False" Checked="CCWRotation_Checked" IsEnabled="False" />
         <TextBlock Height="29" HorizontalAlignment="Left" Margin="12,12,0,0" Name="message" Text="" VerticalAlignment="Top" Width="464" FontSize="13" />
+        <CheckBox Content="Crosshairs stop at baseline" Height="16" HorizontalAlignment="Left" Margin="243,185,0,0" Name="crosshairsStopAtBottomCheckbox" VerticalAlignment="Top" Checked="crosshairsStopAtBottom_Checked" Unchecked="crosshairsStopAtBottom_Unchecked" />
     </Grid>
 </Window>

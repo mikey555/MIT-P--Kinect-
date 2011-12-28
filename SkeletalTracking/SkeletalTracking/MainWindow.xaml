@@ -16,9 +16,9 @@
     </Window.Resources>
     <Canvas Name="MainCanvas" Background="White" DataContext="{Binding}">
         
-        <Grid Height="1050" Canvas.Left="-13" Canvas.Top="0" Width="805" Name="lineGrid" Visibility="Visible"></Grid>
-        <TextBlock Name="messageBlock" Text="(uncalibrated)" FontSize="32" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" TextAlignment="Center" Margin="13,942,14,39" Height="84" Canvas.Top="-15" Width="779" Canvas.Left="-26" />
-        <TextBlock Canvas.Left="Auto" Canvas.Bottom="90" Height="77" Name="textBlock1" Text="" Width="413" FontFamily="Courier New" FontSize="60" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" />
+        <Grid Height="1050" Canvas.Left="-13" Canvas.Top="0" Width="805" Name="lineGrid" Visibility="Visible">
+            <TextBlock Height="77" Name="textBlock1" Text="test" Width="413" FontFamily="Courier New" FontSize="60" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="191,866,201,107" Panel.ZIndex="0" />
+        </Grid>
         <Grid Height="94" Canvas.Bottom="0" Canvas.Left="50" Width="104" Name="crosshair1" Visibility="Visible">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="96" />
