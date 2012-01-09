@@ -59,6 +59,10 @@ namespace SkeletalTracking
             smoothSkeleton = new SmoothSkeleton();
             
             this.updateGrid();
+
+            // this will set default crosshair heights
+            colorWindow.changeRotationMode(gridSettings.rotation);
+
             InitializeComponent();
             colorWindow.Show();
         }
@@ -472,6 +476,11 @@ namespace SkeletalTracking
         {
             GridSettings.crosshairsStopAtBottom = false;
         }
+
+        private void opacitySlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            GridSettings.opacity = opacitySlider.Value;
+        }
        
     }
 
@@ -487,7 +496,7 @@ namespace SkeletalTracking
         public System.Collections.ArrayList lines = new System.Collections.ArrayList();
         public static double crosshairRate = 0;
         public static bool crosshairsStopAtBottom;
-
+        public static double opacity = 1;
 
 
         public GridSettings(double windowWidth, double windowHeight)
@@ -505,19 +514,31 @@ namespace SkeletalTracking
             changeCrosshairRate();
         }
 
+        
+        /// <summary>
+        /// crosshair rate is given by:
+        /// ( (pixel height of app window - pixel height of gap) / baseline )
+        /// where baseline is a pixel distance from the top of the Kinect's range of vision.
+        /// 
+        /// In other words:
+        /// ( pixels traversed by crosshairs / distance, measured in pixels by depth cam, traversed by hands ).
+        /// 
+        /// This is a rate of how fast the crosshairs move up the screen. If the rate is any less, the crosshairs
+        /// will move too slowly and at their highest point will still be partially visible on the grid.
+        /// </summary>
         public void changeCrosshairRate()
         {
             if(CalibrationSettings.isCalibrated) {
                 if (rotation == 0)
                 {
-                    //crosshairRate = (SystemParameters.VirtualScreenHeight / -calibrationBaseline) * 0.9;
-                    crosshairRate = (gridHeight / -CalibrationSettings.calibrationBaseline) * .95;
+                    
+                    crosshairRate = (gridHeight / CalibrationSettings.calibrationBaseline);
                     
                 }
                 if (rotation == 1)
                 {
-                    //crosshairRate = (SystemParameters.VirtualScreenHeight / -calibrationBaseline) * 0.9;
-                    //crosshairRate = (gridWidth / -CalibrationSettings.calibrationBaseline) * .9;
+                    
+                    crosshairRate = (gridWidth / CalibrationSettings.calibrationBaseline);
                 }
             }
 
@@ -802,6 +823,10 @@ namespace SkeletalTracking
             proportion = leftHandRatio / rightHandRatio;
         }
 
+        /*
+        /// <summary>
+        /// deprecated. application doesn't use this method anymore.
+        /// </summary>
         private void createColorArray()
         {
             int arraySize = Convert.ToInt32((topRed - bottomRed) / arrayPrecision);
@@ -844,6 +869,7 @@ namespace SkeletalTracking
                 brushArray[arrayIndex] = greenBrush;
             }
         }
+         * */
 
         
         public SolidColorBrush getCurrentColor(SmoothSkeleton skeleton)

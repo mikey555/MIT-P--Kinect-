@@ -44,5 +44,7 @@
         <RadioButton Content="CCW" Height="16" HorizontalAlignment="Left" Margin="404,193,0,0" Name="CCWRotation" VerticalAlignment="Top" GroupName="rotation" IsChecked="False" Checked="CCWRotation_Checked" IsEnabled="False" />
         <TextBlock Height="29" HorizontalAlignment="Left" Margin="12,12,0,0" Name="message" Text="" VerticalAlignment="Top" Width="464" FontSize="13" />
         <CheckBox Content="Crosshairs stop at baseline" Height="16" HorizontalAlignment="Left" Margin="243,185,0,0" Name="crosshairsStopAtBottomCheckbox" VerticalAlignment="Top" Checked="crosshairsStopAtBottom_Checked" Unchecked="crosshairsStopAtBottom_Unchecked" />
+        <Slider Height="23" HorizontalAlignment="Left" Margin="513,72,0,0" Name="opacitySlider" VerticalAlignment="Top" Width="100" AutoToolTipPlacement="TopLeft" Maximum="1" TickFrequency="0.1" ValueChanged="opacitySlider_ValueChanged" AutoToolTipPrecision="2" />
+        <TextBlock Height="23" HorizontalAlignment="Left" Margin="619,72,0,0" Name="textBlock8" Text="opacity" VerticalAlignment="Top" />
     </Grid>
 </Window>
