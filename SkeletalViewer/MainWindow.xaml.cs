@@ -17,27 +17,19 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using Microsoft.Research.Kinect.Nui;
 using Microsoft.Samples.Kinect.WpfViewers;
-using System.Runtime.InteropServices;
 
 namespace SkeletalViewer
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    /// 
-
-
-
     public partial class MainWindow : Window
     {
         #region ctor & Window events
         public MainWindow()
         {
             InitializeComponent();
-            
         }
-
-        
 
         private void Window_Loaded(object sender, EventArgs e)
         {
@@ -53,8 +45,13 @@ namespace SkeletalViewer
             //Watch for Kinects connecting, disconnecting - and gracefully handle them.
             Runtime.Kinects.StatusChanged += new EventHandler<StatusChangedEventArgs>(Kinects_StatusChanged);
 
+            
             //create a KinectViewer for each Kinect that is found.
             CreateAllKinectViewers();
+
+            // new stuff
+            
+            
         }
 
         private void Window_Closed(object sender, EventArgs e)
@@ -108,8 +105,6 @@ namespace SkeletalViewer
         }
         #endregion Kinect discovery + setup
 
-       
-
         private void UpdateUIBasedOnKinectCount()
         {
             //Update the visibility of the status messages based on min/maxKinectCount and the number of Kinects
@@ -151,7 +146,7 @@ namespace SkeletalViewer
         {
             var kinectViewer = new KinectDiagnosticViewer();
             kinectViewer.kinectDepthViewer.MouseLeftButtonDown += new MouseButtonEventHandler(kinectDepthViewer_MouseLeftButtonDown);
-            kinectViewer.Kinect= runtime;
+            kinectViewer.Kinect = runtime;
             viewerHolder.Items.Add(kinectViewer);
         }
 
@@ -159,7 +154,7 @@ namespace SkeletalViewer
         {
             while (sender != null && sender is FrameworkElement)
             {
-                sender = ((FrameworkElement) sender).Parent;
+                sender = ((FrameworkElement)sender).Parent;
                 if (sender is KinectDiagnosticViewer)
                 {
                     return sender as KinectDiagnosticViewer;
@@ -309,9 +304,9 @@ namespace SkeletalViewer
         #region Private state
         private int minKinectCount = 1;       //0 - app is "Kinect Enabled". 1 - app "Requires Kinect".
         const int maxKinectCount = 2; //Change to 1 if you only want to view one at a time. Switching will be enabled.
-                                      //Each Kinect needs to be in its own USB hub, otherwise it won't have enough USB bandwidth.
-                                      //Currently only 1 Kinect per process can have SkeletalTracking working, but color and depth work for all.
-                                      //KinectSDK TODO: enable a larger maxKinectCount (assuming your PC can dedicate a USB hub for each Kinect)
+        //Each Kinect needs to be in its own USB hub, otherwise it won't have enough USB bandwidth.
+        //Currently only 1 Kinect per process can have SkeletalTracking working, but color and depth work for all.
+        //KinectSDK TODO: enable a larger maxKinectCount (assuming your PC can dedicate a USB hub for each Kinect)
         #endregion Private state
     }
 }

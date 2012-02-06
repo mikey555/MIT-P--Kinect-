@@ -16,3 +16,13 @@ C:\Users\Michael\Documents\Visual Studio 2010\Projects\KinectDemo\SkeletonDemo\S
 C:\Users\Michael\Documents\Visual Studio 2010\Projects\KinectDemo\SkeletonDemo\SkeletalTracking\SkeletalTracking\SkeletalTracking\obj\x86\Release\SkeletalTracking.exe
 C:\Users\Michael\Documents\Visual Studio 2010\Projects\KinectDemo\SkeletonDemo\SkeletalTracking\SkeletalTracking\SkeletalTracking\obj\x86\Release\SkeletalTracking.pdb
 C:\Users\Michael\Documents\Visual Studio 2010\Projects\KinectDemo\SkeletonDemo\SkeletalTracking\SkeletalTracking\SkeletalTracking\bin\Release\SkeletalTracking.exe.config
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\KinectDemo\SkeletonDemo\SkeletalTracking\SkeletalTracking\SkeletalTracking\obj\x86\Release\ExpressionDark.baml
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\KinectDemo\SkeletonDemo\SkeletalTracking\SkeletalTracking\SkeletalTracking\obj\x86\Release\ExpressionLight.baml
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\KinectDemo\SkeletonDemo\SkeletalTracking\SkeletalTracking\SkeletalTracking\obj\x86\Release\App.baml
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\KinectDemo\SkeletonDemo\SkeletalTracking\SkeletalTracking\SkeletalTracking\obj\x86\Release\SkeletalTracking_Content.g.cs
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\KinectDemo\SkeletonDemo\SkeletalTracking\SkeletalTracking\SkeletalTracking\bin\Release\Microsoft.Samples.Kinect.WpfViewers.dll
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\KinectDemo\SkeletonDemo\SkeletalTracking\SkeletalTracking\SkeletalTracking\bin\Release\SkeletalViewer.exe
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\KinectDemo\SkeletonDemo\SkeletalTracking\SkeletalTracking\SkeletalTracking\bin\Release\WPFToolkit.Design.dll
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\KinectDemo\SkeletonDemo\SkeletalTracking\SkeletalTracking\SkeletalTracking\bin\Release\WPFToolkit.dll
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\KinectDemo\SkeletonDemo\SkeletalTracking\SkeletalTracking\SkeletalTracking\bin\Release\WPFToolkit.VisualStudio.Design.dll
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\KinectDemo\SkeletonDemo\SkeletalTracking\SkeletalTracking\SkeletalTracking\bin\Release\Microsoft.Samples.Kinect.WpfViewers.pdb

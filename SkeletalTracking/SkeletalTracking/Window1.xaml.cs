@@ -13,6 +13,8 @@ using System.Windows.Shapes;
 using Microsoft.Research.Kinect.Nui;
 using Coding4Fun.Kinect.Wpf;
 using Kinect.Extensions;
+using System.Threading;
+
 
 namespace SkeletalTracking
 {
@@ -46,18 +48,22 @@ namespace SkeletalTracking
         
         public Window1()
         {
+            
+
             colorWindow = new MainWindow();
             nui = Runtime.Kinects[0];
             nui.Initialize(RuntimeOptions.UseColor);
             nui.NuiCamera.ElevationAngle = 0;
+
             
+
             // initialize grid
             gridSettings = new GridSettings(colorWindow.Width, colorWindow.Height);
             toleranceSettings = new ToleranceSettings();
             calibrationSettings = new CalibrationSettings();
 
             smoothSkeleton = new SmoothSkeleton();
-            
+       
             this.updateGrid();
 
             // this will set default crosshair heights
@@ -65,10 +71,17 @@ namespace SkeletalTracking
 
             InitializeComponent();
             colorWindow.Show();
+
+            toleranceOption1.IsChecked = true;
+            
         }
 
+
+        
+
         public void updateGrid() {
-            colorWindow.updateGrid(gridSettings.lines);
+            gridSettings.callSetGridUnits();
+            colorWindow.updateGrid(gridSettings.lines, gridSettings.numbers);
             colorWindow.lineGrid.SetValue(WidthProperty, gridSettings.gridWidth);
             colorWindow.lineGrid.SetValue(HeightProperty, gridSettings.gridHeight);
         }
@@ -83,9 +96,9 @@ namespace SkeletalTracking
         
         
         // depth + vga viewer
-        SkeletalViewer.MainWindow viewer = new SkeletalViewer.MainWindow();
+        SkeletalViewer.MainWindow viewer;
         bool viewerOpen = false;
-
+        
 
 
 
@@ -119,11 +132,12 @@ namespace SkeletalTracking
             nui.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(nui_SkeletonFrameReady);
 
         }
-
+        
         private void Window_Closed(object sender, EventArgs e)
         {
             //Cleanup
             nui.Uninitialize();
+            
         }
 
 
@@ -177,6 +191,7 @@ namespace SkeletalTracking
             try
             {
                 toleranceSettings.changeLeftHandValue(leftHandSlider.Value);
+                leftProportionText.Text = leftHandSlider.Value.ToString();
             }
             catch (NullReferenceException ex) 
             {
@@ -188,6 +203,7 @@ namespace SkeletalTracking
             try
             {
                 toleranceSettings.changeRightHandValue(rightHandSlider.Value);
+                rightProportionText.Text = rightHandSlider.Value.ToString();
             }
             catch (NullReferenceException ex)
             {
@@ -254,31 +270,51 @@ namespace SkeletalTracking
             }
         }
 
-        private void launchViewer_Click(object sender, RoutedEventArgs e)
+        private void launchViewerThread_Click(object sender, RoutedEventArgs e)
         {
-            if (viewerOpen == false)
+            //ThreadStart viewerDelegate = new ThreadStart(toggleViewer);
+            //Thread viewerThread = new Thread(viewerDelegate);
+            Thread viewerThread = new Thread(delegate()
             {
+                viewer = new SkeletalViewer.MainWindow();
                 
-                viewer.Show();
-                //String launchViewerButtonContent = "Launch Depth Viewer";
-                launchViewer.SetValue(ContentProperty, "Close Depth Viewer");
-                viewerOpen = true;
-            }
-            else {
-                viewer.Hide();
-                launchViewer.SetValue(ContentProperty, "Launch Depth Viewer");
-                viewerOpen = false;
-            }
+                viewer.Dispatcher.Invoke(new Action(delegate() 
+                    {
+                        
+                        viewer.Show();
+                        System.Windows.Threading.Dispatcher.Run();
+
+                    }));
+                SolidColorBrush green = new SolidColorBrush(Colors.Green);
+                
+                
+            });
+
+
+            viewerThread.SetApartmentState(ApartmentState.STA); // needs to be STA or throws exception
+            viewerThread.Start();
+            
         }
+
+        private void toggleViewer()
+        {
+            
+            viewer = new SkeletalViewer.MainWindow();
+
+            
+
+            //viewer.Show();
+        }
+
 
         private void enableCrosshairs_Checked(object sender, RoutedEventArgs e)
         {
-            colorWindow.enableCrosshairs();
+            colorWindow.toggleCrosshairs();
         }
 
         private void enableCrosshairs_Unchecked(object sender, RoutedEventArgs e)
         {
-            colorWindow.enableCrosshairs();
+            colorWindow.toggleCrosshairs();
         }
 
         //private void toleranceSlider_ValueChanged_1(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -287,31 +323,38 @@ namespace SkeletalTracking
         //    colorWindow.setTolerance(toleranceSlider.Value);
         //}
 
-        private void textBox1_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            if (textBox1.Text != "")
-            {
-                int value = Int32.Parse(textBox1.Text);
-                toleranceSettings.setTolerance(value);
-            }
-        }
+        
 
         private void toleranceOption1_Checked(object sender, RoutedEventArgs e)
         {
-            toleranceSettings.setToleranceMode(false);
+            toleranceSettings.setToleranceMode(true);
+
+            // enable absolute tolerance settings
+            absoluteGreenYellowFadeTextbox.IsEnabled = true;
+            absoluteYellowRedFadeTextbox.IsEnabled = true;
+            absoluteToleranceTextbox.IsEnabled = true;
+            
+            // disable proportional tolerance settings
+            proportionalGreenYellowFadeTextbox.IsEnabled = false;
+            proportionalYellowRedFadeTextbox.IsEnabled = false;
+            proportionalToleranceTextbox.IsEnabled = false;
         }
 
         private void toleranceOption2_Checked(object sender, RoutedEventArgs e)
         {
-            toleranceSettings.setToleranceMode(true);
+            toleranceSettings.setToleranceMode(false);
+
+            // enable proportional tolerance settings
+            proportionalGreenYellowFadeTextbox.IsEnabled = true;
+            proportionalYellowRedFadeTextbox.IsEnabled = true;
+            proportionalToleranceTextbox.IsEnabled = true;
+
+            // disable absolute tolerance settings
+            absoluteGreenYellowFadeTextbox.IsEnabled = false;
+            absoluteYellowRedFadeTextbox.IsEnabled = false;
+            absoluteToleranceTextbox.IsEnabled = false;
         }
 
-        private void setToleranceRange_Click(object sender, RoutedEventArgs e)
-        {
-            toleranceSettings.setMinTolerance(Convert.ToInt32(minToleranceBox.Text));
-            toleranceSettings.setMaxTolerance(Convert.ToInt32(maxToleranceBox.Text));
-            toleranceOption2.SetValue(IsEnabledProperty, true);
-        }
 
         private void HideRatioValueCheckbox_Checked(object sender, RoutedEventArgs e)
         {
@@ -333,7 +376,7 @@ namespace SkeletalTracking
                 if (newGridUnits < 1)
                 {
                     //message.Text = "GRID UNITS: please enter a number greater than 1.";
-                    this.sendMessage("GRID UNITS: please enter a number greater than 1.");
+                    this.sendMessage("GRID UNITS: please enter a number greater than 0.");
                     numberOfGridUnits.Background = new SolidColorBrush(Color.FromArgb(255,255,95,95));
                     
                 }
@@ -436,15 +479,27 @@ namespace SkeletalTracking
                 updateGrid();
             }
             
+            
         }
 
-        private void CCWRotation_Checked(object sender, RoutedEventArgs e)
+        
+
+        public void errorBox(TextBox box, string boxName, double lowerBound, double upperBound)
         {
-            colorWindow.SetValue(WidthProperty, SystemParameters.VirtualScreenWidth);
-            colorWindow.SetValue(HeightProperty, SystemParameters.VirtualScreenHeight);
-            this.gridSettings.resize(SystemParameters.VirtualScreenWidth, SystemParameters.VirtualScreenHeight, -1);
-            updateGrid();
-            colorWindow.changeRotationMode(-1);
+            box.Background = new SolidColorBrush(Color.FromArgb(255,255,95,95));
+            sendMessage(boxName + ": enter a number between " + lowerBound + " and " + upperBound + ".");
+        }
+
+        public void errorBox(TextBox box, string boxName, double lowerBound)
+        {
+            box.Background = new SolidColorBrush(Color.FromArgb(255,255,95,95));
+            sendMessage(boxName + ": enter a number greater than " + lowerBound + ".");
+        }
+
+        public void unerrorBox(TextBox box)
+        {
+            box.Background = new SolidColorBrush(Colors.White);
+            message.Text = "";
         }
 
         // tilt
@@ -461,6 +516,7 @@ namespace SkeletalTracking
         private void tiltSlider_ValueChanged_1(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             tiltValue = Convert.ToInt32(tiltSlider.Value);
+            tiltText.Text = Math.Round (tiltSlider.Value,1).ToString();
         }
 
         private void setTiltButton_Click(object sender, RoutedEventArgs e)
@@ -481,22 +537,170 @@ namespace SkeletalTracking
         {
             GridSettings.opacity = opacitySlider.Value;
         }
+
+        private void tabControl1_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+        }
+
+        private void checkRange(TextBox box, string boxName, double value, double lowerBound, double upperBound)
+        {
+            if (value > lowerBound && value < upperBound)
+                this.unerrorBox(box);
+            else
+                this.errorBox(box, boxName, lowerBound, upperBound);
+        }
+
+        private void checkRange(TextBox box, string boxName, double value, double lowerBound)
+        {
+            if (value > lowerBound)
+                this.unerrorBox(box);
+            else
+                this.errorBox(box, boxName, lowerBound);
+        }
+
+        private void proportionalToleranceTextbox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            try
+            {
+                toleranceSettings.boxChanged("proportionalTolerance", proportionalToleranceTextbox.Text);
+                this.checkRange(proportionalToleranceTextbox, "PROP. TOLERANCE", Convert.ToDouble(proportionalToleranceTextbox.Text), 0, 1);
+            }
+            catch (Exception ex)
+            {
+                this.errorBox(proportionalToleranceTextbox, "PROP. TOLERANCE", 0, 1);
+            }
+        }
+
+        private void proportionalGreenYellowFadeTextbox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            try
+            {
+                toleranceSettings.boxChanged("proportionalGreenYellowFade", proportionalGreenYellowFadeTextbox.Text);
+                this.checkRange(proportionalGreenYellowFadeTextbox, "PROP. GREEN-YELLOW FADE", Convert.ToDouble(proportionalGreenYellowFadeTextbox.Text), 0, 1);
+            }
+            catch (Exception ex)
+            {
+                this.errorBox(proportionalGreenYellowFadeTextbox, "PROP. GREEN-YELLOW FADE", 0, 1);
+            }
+        }
+
+        private void proportionalYellowRedFadeTextbox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            try
+            {
+                toleranceSettings.boxChanged("proportionalYellowRedFade", proportionalYellowRedFadeTextbox.Text);
+                this.checkRange(proportionalYellowRedFadeTextbox, "PROP. YELLOW-RED FADE", Convert.ToDouble(proportionalYellowRedFadeTextbox.Text), 0, 1);
+            }
+            catch (Exception ex)
+            {
+                this.errorBox(proportionalYellowRedFadeTextbox, "PROP. YELLOW-RED FADE", 0, 1);
+            }
+        }
+
+        private void absoluteToleranceTextbox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            try
+            {
+                toleranceSettings.boxChanged("absoluteTolerance", absoluteToleranceTextbox.Text);
+                this.checkRange(absoluteToleranceTextbox, "ABS. TOLERANCE", Convert.ToDouble(absoluteToleranceTextbox.Text), 0);
+            }
+            catch (Exception ex)
+            {
+                this.errorBox(absoluteToleranceTextbox, "ABS. TOLERANCE", 0);
+            }
+        }
+
+        private void absoluteGreenYellowFadeTextbox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            try
+            {
+                toleranceSettings.boxChanged("absoluteGreenYellowFade", absoluteGreenYellowFadeTextbox.Text);
+                this.checkRange(absoluteGreenYellowFadeTextbox, "ABS. GREEN-YELLOW FADE", Convert.ToDouble(absoluteGreenYellowFadeTextbox.Text), 0);
+            }
+            catch (Exception ex)
+            {
+                this.errorBox(absoluteToleranceTextbox, "ABS. GREEN-YELLOW FADE", 0);
+            }
+        }
+
+        private void absoluteYellowRedFadeTextbox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            try
+            {
+                toleranceSettings.boxChanged("absoluteYellowRedFade", absoluteYellowRedFadeTextbox.Text);
+                this.checkRange(absoluteYellowRedFadeTextbox, "ABS. YELLOW-RED FADE", Convert.ToDouble(absoluteYellowRedFadeTextbox.Text), 0);
+            }
+            catch (Exception ex)
+            {
+                this.errorBox(absoluteYellowRedFadeTextbox, "ABS. YELLOW-RED FADE", 0);
+            }
+        }
+
+        
+
+        private void tiltText_TextChanged(object sender, TextChangedEventArgs e)
+        {
+
+        }
+
+        private void button1_Click(object sender, RoutedEventArgs e)
+        {
+            absoluteToleranceTextbox.Text = "50";
+            absoluteGreenYellowFadeTextbox.Text = "5";
+            absoluteYellowRedFadeTextbox.Text = "5";
+
+            proportionalToleranceTextbox.Text = ".10";
+            proportionalGreenYellowFadeTextbox.Text = ".01";
+            proportionalYellowRedFadeTextbox.Text = ".01";
+
+            message.Text = "";
+        }
+
+        private void checkBox2_Checked(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+
+        private void slider5_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            colorWindow.setCrosshairSize(slider5.Value);
+        }
+
+        private void slider6_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            colorWindow.setCrosshairThickness(slider6.Value);
+        }
+
+        private void gridUnitsSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            gridSettings.setGridUnits(Convert.ToInt32(gridUnitsSlider.Value), gridSettings.rotation);
+            updateGrid();
+        }  
+
+        
        
     }
 
     public class GridSettings
     {
 
-        public static int gapSize = 50;                 // crosshair height: 100
+        public static int verticalGapSize = 50;                 // crosshair height: 100
+        int horizontalGapSize = 50;
         DoubleCollection lineStyle = new DoubleCollection();
         public int gridUnits = 10;
         public int rotation = 0;
         public double gridWidth;
         public double gridHeight;
         public System.Collections.ArrayList lines = new System.Collections.ArrayList();
+        public System.Collections.ArrayList numbers = new System.Collections.ArrayList();
         public static double crosshairRate = 0;
         public static bool crosshairsStopAtBottom;
         public static double opacity = 1;
+        bool leftSideNumbersEnabled = false;
+        bool rightSideNumbersEnabled = false;
+        double sideNumberSize = 1;
 
 
         public GridSettings(double windowWidth, double windowHeight)
@@ -514,6 +718,19 @@ namespace SkeletalTracking
             changeCrosshairRate();
         }
 
+        public void setSideNumberSize(double value)
+        {
+            sideNumberSize = value;
+        }
+
+        public void toggleBool(bool var)
+        {
+            if (var == true){
+                var = false;
+            }
+            else 
+                var = true;
+        }
         
         /// <summary>
         /// crosshair rate is given by:
@@ -548,41 +765,50 @@ namespace SkeletalTracking
         /// <summary>
         /// puts new grid lines into (Arraylist lines) according to grid unit and rotation (parameters), gap size, and the size of the color window (specified in gridSetup). a call to setGridUnits is usually followed by a call to updateGrid().
         /// </summary>
-        /// <param name="gridUnits">number of units between top and bottom lines (what the crosshairs move through)</param>
+        /// <param name="gridUnits">number of units between the baseline and the top of the screen</param>
         /// <param name="rotation">0 = developer; 1 = 90deg clockwise, -1 = 90deg counterclockwise</param>
+        public void callSetGridUnits()
+        {
+            setGridUnits(gridUnits, rotation);
+        }
+        
+        // gridUnits = number of units (squares) from bottom line to top of screen)
         public void setGridUnits(int gridUnits, int rotation)
         {
             lines.Clear();
+            numbers.Clear();
 
             this.gridUnits = gridUnits;
             this.rotation = rotation;
 
             // gridsize: pixel length of a side of one square
-            int gridSize = 0;
+            int unitSize = 0;
             if (rotation == 0)
             {
                 if (gridUnits > 0)
                 {
-                    gridSize = Convert.ToInt32(gridHeight - gapSize * 2) / gridUnits;
+                    unitSize = Convert.ToInt32(gridHeight - verticalGapSize) / gridUnits;
                 }
                 else
                 {
-                    gridSize = Convert.ToInt32(gridHeight - gapSize * 2);
+                    unitSize = Convert.ToInt32(gridHeight - verticalGapSize);
                 }
             }
-            if (rotation == 1 | rotation == -1)
+            if (rotation == 1)
             {
                 if (gridUnits > 0)
                 {
-                    gridSize = Convert.ToInt32(gridWidth - gapSize * 2) / gridUnits;
+                    unitSize = Convert.ToInt32(gridWidth - verticalGapSize) / gridUnits;
                 }
                 else
                 {
-                    gridSize = Convert.ToInt32(gridWidth - gapSize * 2);
+                    unitSize = Convert.ToInt32(gridWidth - verticalGapSize);
                 }
             }
 
             // rows
+            //top thick line
+            /*
             Line topLine = new Line();
             topLine.Stroke = System.Windows.Media.Brushes.Black;
             if (rotation == 0)
@@ -599,19 +825,13 @@ namespace SkeletalTracking
                 topLine.Y1 = 0;
                 topLine.Y2 = gridHeight;
             }
-            if (rotation == -1)
-            {
-                topLine.X1 = gridWidth - gapSize;
-                topLine.X2 = gridWidth - gapSize;
-                topLine.Y1 = 0;
-                topLine.Y2 = gridHeight;
-            }
+            
 
             topLine.StrokeThickness = 3;
             topLine.StrokeDashArray = lineStyle;
             // lineGrid.Children.Add(topLine);
             lines.Add(topLine);
-            
+            */
 
             Line bottomLine = new Line();
             bottomLine.Stroke = System.Windows.Media.Brushes.Black;
@@ -620,55 +840,111 @@ namespace SkeletalTracking
             {
                 bottomLine.X1 = 0;
                 bottomLine.X2 = gridWidth;
-                bottomLine.Y1 = gridHeight - gapSize;
-                bottomLine.Y2 = gridHeight - gapSize;
+                bottomLine.Y1 = gridHeight - verticalGapSize;
+                bottomLine.Y2 = gridHeight - verticalGapSize;
             }
             if (rotation == 1)
             {
-                bottomLine.X1 = gridWidth - gapSize;
-                bottomLine.X2 = gridWidth - gapSize;
+                bottomLine.X1 = gridWidth - horizontalGapSize;
+                bottomLine.X2 = gridWidth - horizontalGapSize;
                 bottomLine.Y1 = 0;
                 bottomLine.Y2 = gridHeight;
             }
-            if (rotation == -1)
-            {
-                bottomLine.X1 = gapSize;
-                bottomLine.X2 = gapSize;
-                bottomLine.Y1 = 0;
-                bottomLine.Y2 = gridHeight;
-            }
+            
 
             bottomLine.StrokeThickness = 3;
             bottomLine.StrokeDashArray = lineStyle;
             lines.Add(bottomLine);
-
+            
 
             // rows
-            for (int i = 1; i < gridUnits; i++)
+            for (int i = 0; i < gridUnits + 1; i++)
             {
+               
                 Line midLine = new Line();
                 midLine.Stroke = System.Windows.Media.Brushes.Black;
+                
+                TextBlock leftNumber;
+                TextBlock rightNumber;
+                
+                leftNumber = new TextBlock();
+                leftNumber.Text = i.ToString();
+                
+                
+                rightNumber = new TextBlock();
+                rightNumber.Text = i.ToString();
+
+                TransformGroup tg = new TransformGroup();
+                ScaleTransform st = new ScaleTransform(sideNumberSize, sideNumberSize, 5, 5);
+
                 if (rotation == 0)
                 {
                     midLine.X1 = 0;
                     midLine.X2 = gridWidth;
-                    midLine.Y1 = i * gridSize + gapSize;
-                    midLine.Y2 = i * gridSize + gapSize;
+                    midLine.Y1 = gridHeight - verticalGapSize - (i * unitSize);
+                    midLine.Y2 = gridHeight - verticalGapSize - (i * unitSize);
+
+                    tg.Children.Add(st);
+                    leftNumber.RenderTransform = tg;
+                    rightNumber.RenderTransform = tg;
+                    
+                    leftNumber.Margin = new Thickness(
+                        horizontalGapSize - 10, 
+                        gridHeight - verticalGapSize - (i * unitSize) - 5, 
+                        0, 
+                        0);
+
+                    rightNumber.Margin = new Thickness(
+                        //Math.Round((gridWidth / gridUnits), 1) * gridUnits + 5,
+                        Math.Floor(gridWidth / gridUnits) * gridUnits - 20,
+                        gridHeight - verticalGapSize - (i * unitSize) - 5,
+                        0,
+                        0);
+
+                    
+                    
+
+                    
                 }
-                if (rotation == 1 | rotation == -1)
+                if (rotation == 1)
                 {
-                    midLine.X1 = i * gridSize + gapSize;
-                    midLine.X2 = i * gridSize + gapSize;
+                    midLine.X1 = gridWidth - verticalGapSize - (i * unitSize);
+                    midLine.X2 = gridWidth - verticalGapSize - (i * unitSize);
                     midLine.Y1 = 0;
                     midLine.Y2 = gridHeight;
+
+
+                    RotateTransform rt = new RotateTransform(-90);
+                    
+                    tg.Children.Add(rt);
+                    tg.Children.Add(st);
+                    leftNumber.RenderTransform = tg;
+                    rightNumber.RenderTransform = tg;
+                    
+                    leftNumber.Margin = new Thickness(
+                        gridWidth - verticalGapSize - (i * unitSize) - 5,
+                        gridHeight - verticalGapSize + 20,
+                        0,
+                        0);
+
+                    rightNumber.Margin = new Thickness(
+                        //Math.Round((gridWidth / gridUnits), 1) * gridUnits + 5,
+                        gridWidth - verticalGapSize - (i * unitSize) - 5,
+                        50,
+                        0,
+                        0);
+
                 }
                 midLine.StrokeThickness = 1;
                 midLine.StrokeDashArray = lineStyle;
                 lines.Add(midLine);
+                numbers.Add(leftNumber);
+                numbers.Add(rightNumber);
+                
             }
 
             // columns
-            for (int j = 1; j < gridWidth / gridUnits; j++)
+            for (int j = 0; j < gridWidth / gridUnits; j++)
             {
                 Line midLine = new Line();
                 midLine.Stroke = System.Windows.Media.Brushes.Black;
@@ -676,20 +952,88 @@ namespace SkeletalTracking
                 {
                     midLine.Y1 = 0;
                     midLine.Y2 = gridHeight;
-                    midLine.X1 = j * gridSize;
-                    midLine.X2 = j * gridSize;
+                    midLine.X1 = horizontalGapSize + (j * unitSize);
+                    midLine.X2 = horizontalGapSize + (j * unitSize);
                 }
-                if (rotation == 1 | rotation == -1)
+                /*
+                if (rotation == 1)
                 {
-                    midLine.Y1 = j * gridSize;
-                    midLine.Y2 = j * gridSize;
+                    midLine.Y1 = j * unitSize;
+                    midLine.Y2 = j * unitSize;
                     midLine.X1 = 0;
                     midLine.X2 = gridWidth;
                 }
+                */
+                if (rotation == 1)
+                {
+                    midLine.Y1 = j * unitSize;
+                    midLine.Y2 = j * unitSize;
+                    midLine.X1 = 0;
+                    midLine.X2 = gridWidth;
+                }
+
                 midLine.StrokeThickness = 1;
                 midLine.StrokeDashArray = lineStyle;
                 lines.Add(midLine);
             }
+
+            // fill in the gaps -- rows
+            if (verticalGapSize > unitSize)
+            {
+                for (int i = 0; i < (verticalGapSize / unitSize); i++) 
+                {
+                    Line gapLine = new Line();
+                    gapLine.Stroke = System.Windows.Media.Brushes.Black;
+                    if (rotation == 0)
+                    {
+                        gapLine.X1 = 0;
+                        gapLine.X2 = gridWidth;
+                        gapLine.Y1 = gridHeight - verticalGapSize + unitSize + (i * unitSize);
+                        gapLine.Y2 = gridHeight - verticalGapSize + unitSize + (i * unitSize);
+                    }
+                    if (rotation == 1)
+                    {
+                        gapLine.X1 = gridWidth - unitSize - (i * unitSize);
+                        gapLine.X2 = gridWidth - unitSize - (i * unitSize);
+                        gapLine.Y1 = 0;
+                        gapLine.Y2 = gridHeight;
+                    }
+                    gapLine.StrokeThickness = 1;
+                    gapLine.StrokeDashArray = lineStyle;
+                    lines.Add(gapLine);
+                }
+            }
+
+            // fill in the gaps -- columns
+            if (horizontalGapSize > unitSize)
+            {
+                for (int j = 0; j < horizontalGapSize / unitSize; j++)
+                {
+                    Line gapLine = new Line();
+                    gapLine.Stroke = System.Windows.Media.Brushes.Black;
+                    if (rotation == 0)
+                    {
+                        gapLine.Y1 = 0;
+                        gapLine.Y2 = gridHeight;
+                        gapLine.X1 = horizontalGapSize + (j * unitSize);
+                        gapLine.X2 = horizontalGapSize + (j * unitSize);
+                    }
+                    if (rotation == 1)
+                    {
+                        gapLine.Y1 = j * unitSize;
+                        gapLine.Y2 = j * unitSize;
+                        gapLine.X1 = 0;
+                        gapLine.X2 = gridWidth;
+                    }
+                    gapLine.StrokeThickness = 1;
+                    gapLine.StrokeDashArray = lineStyle;
+                    lines.Add(gapLine);
+                }
+            }
+
+
+            // add numbers 
+            // left and right sides
 
 
 
@@ -698,13 +1042,13 @@ namespace SkeletalTracking
 
     public class ToleranceSettings
     {
-        // tolerance:
-        // true = relative tolerance
-        // false = absolute tolerance
-        bool toleranceMode;
+        // toleranceMode:
+        // true = absolute tolerance (tolerance is bounded by actual hand heights -- 
+        //          number of inches above/below hand)
+        // false = proportional tolerance (tolerance is bounded by proportion values --
+        //          percentage above/below hand)
+        bool toleranceMode = false;
         double maxHandPosition;
-        double maxTolerance;
-        double minTolerance;
         double toleranceLeftHand;
         double toleranceRightHand;
         public double calibratedLeftHandPos;
@@ -715,11 +1059,16 @@ namespace SkeletalTracking
         double rightHandRatio;
 
         double proportion;
-        double tolerance;
-        double greenYellowFade;
-        double yellowRedFade;
 
-        // gradient points
+        double proportionalTolerance;   // a range of proportions
+        double proportionalGreenYellowFade;
+        double proportionalYellowRedFade;
+
+        double absoluteTolerance;       // a pixel distance
+        double absoluteGreenYellowFade;
+        double absoluteYellowRedFade;
+
+        // proportion gradient points
         double bottomTolerance;
         double topTolerance;
         double topYellow;
@@ -727,85 +1076,138 @@ namespace SkeletalTracking
         double topRed;
         double bottomRed;
 
-        double arrayPrecision;
         SolidColorBrush[] brushArray;
         SolidColorBrush greenBrush = new SolidColorBrush(Colors.Green);
         SolidColorBrush redBrush = new SolidColorBrush(Colors.Red);
 
         public ToleranceSettings()
-        {
-            arrayPrecision = .001;
-            
-            // relative or absolute tolerance?
-            toleranceMode = false;
-            maxTolerance = 0;
-            minTolerance = 0;
-            
-            // these are constrained
+        {            
+
+            // these vars are constrained
             leftHandRatio = 1;
             rightHandRatio = 1;
-            proportion = 0.5; // can only have 2 decimal digits!!
+            proportion = 1; // can only have 2 decimal digits!!
             
-            tolerance = .1;
-            greenYellowFade = .01;
-            yellowRedFade = .01;
+            
+            absoluteTolerance = 10;
+            absoluteGreenYellowFade = 5;
+            absoluteYellowRedFade = 5;
+            
+            proportionalTolerance = .1;
+            proportionalGreenYellowFade = .01;
+            proportionalYellowRedFade = .01;
 
             recalculateGradientPoints();
-            //createColorArray();
-
             
+        }
+
+        public void boxChanged(string doubleName, string text)
+        {
+            try
+            {
+                switch (doubleName)
+                {
+                    case "absoluteTolerance":
+                        setDouble(ref absoluteTolerance, text);
+                        break;
+                    case "absoluteGreenYellowFade":
+                        setDouble(ref absoluteGreenYellowFade, text);
+                        break;
+                    case "absoluteYellowRedFade":
+                        setDouble(ref absoluteYellowRedFade, text);
+                        break;
+                    case "proportionalTolerance":
+                        setDouble(ref proportionalTolerance, text);
+                        break;
+                    case "proportionalYellowRedFade":
+                        setDouble(ref proportionalYellowRedFade, text);
+                        break;
+                    case "proportionalGreenYellowFade":
+                        setDouble(ref proportionalGreenYellowFade, text);
+                        break;
+                        
+                }
+            }
+            catch (FormatException ex)
+            {
+                throw ex;
+            }
+        }
+
+        private void setDouble(ref Double d, string text)
+        {
+            if (text.Trim() != "")
+            {
+                Double oldValue = d;
+                try
+                {
+                    Double value = Double.Parse(text);
+                    d = value;
+                }
+                catch (FormatException ex)
+                {
+                    d = oldValue;
+                    throw ex;
+                }
+
+            }
         }
 
         private void updateToleranceSettings()
         {
             recalculateProportion();
             recalculateGradientPoints();
-            //createColorArray();
         }
 
         /// <summary>
         /// sets interpolation boundaries. e.g., bottomTolerance and topTolerance are 1.9 and 2.1 when proportion = 2 and tolerance = 0.1.
-        /// bottomRed, bottomYellow, bottomTolerance (green) are points on the proportion spectrum BELOW the secret proportion where solid colors will appear
+        /// bottomRed, bottomYellow, bottomTolerance (green) are points on the proportion spectrum BELOW the secret proportion where solid colors will appear.
+        /// Not used in absolute tolerance mode, where tolerance limits are calculated in real time.
         /// </summary>
         private void recalculateGradientPoints()
         {
             // double arithmetic precision sucks, so round numbers to two decimal places
             // (this is the precision we are working with, after all)
-            bottomTolerance = proportion - (tolerance / 2);
-            bottomTolerance = Math.Round(bottomTolerance, 3);
-            topTolerance = proportion + (tolerance / 2);
-            topTolerance = Math.Round(topTolerance, 3);
-            topYellow = proportion + (tolerance / 2) + greenYellowFade;
-            topYellow = Math.Round(topYellow, 3);
-            bottomYellow = proportion - (tolerance / 2) - greenYellowFade;
-            bottomYellow = Math.Round(bottomYellow, 3);
-            topRed = proportion + greenYellowFade + yellowRedFade + (tolerance / 2);
-            topRed = Math.Round(topRed, 3);
-            bottomRed = proportion - greenYellowFade - yellowRedFade - (tolerance / 2);
-            bottomRed = Math.Round(bottomRed, 3);
             
+            // proportional tolerance
+            if (toleranceMode == false)
+            {
+                bottomTolerance = proportion - (proportionalTolerance / 2);
+                bottomTolerance = Math.Round(bottomTolerance, 3);
+                topTolerance = proportion + (proportionalTolerance / 2);
+                topTolerance = Math.Round(topTolerance, 3);
+                topYellow = proportion + (proportionalTolerance / 2) + proportionalGreenYellowFade;
+                topYellow = Math.Round(topYellow, 3);
+                bottomYellow = proportion - (proportionalTolerance / 2) - proportionalGreenYellowFade;
+                bottomYellow = Math.Round(bottomYellow, 3);
+                topRed = proportion + proportionalGreenYellowFade + proportionalYellowRedFade + (proportionalTolerance / 2);
+                topRed = Math.Round(topRed, 3);
+                bottomRed = proportion - proportionalGreenYellowFade - proportionalYellowRedFade - (proportionalTolerance / 2);
+                bottomRed = Math.Round(bottomRed, 3);
+            }
+            
+
         }
 
         public void setToleranceMode(bool mode)
         {
             toleranceMode = mode;
-        }
-        public void setMinTolerance(int minT)
-        {
-            minTolerance = minT;
-        }
-        public void setMaxTolerance(int maxT)
-        {
-            maxTolerance = maxT;
-        }
-        public void setTolerance(int toleranceValue)
-        {
-            if (toleranceValue <= 50 && toleranceValue >= 0)
+            if (mode == false)
             {
-
-                tolerance = (double)toleranceValue / 100;
+                recalculateGradientPoints();
             }
         }
+
+        //public void setTolerance(int toleranceValue)
+        //{
+        //    if (toleranceValue <= 50 && toleranceValue >= 0)
+        //    {
+
+        //        proportionalTolerance = (double)toleranceValue / 100;
+        //    }
+        //}
+
+
         public void changeLeftHandValue(double leftValue)
         {
             leftHandRatio = leftValue;
@@ -872,6 +1274,7 @@ namespace SkeletalTracking
          * */
 
         
+        
         public SolidColorBrush getCurrentColor(SmoothSkeleton skeleton)
         {
             // top of screen = 0
@@ -895,46 +1298,114 @@ namespace SkeletalTracking
             
 
             double currentProportion = Math.Round(calibratedLeftHandPos / calibratedRightHandPos, 3);
+            
 
             // implement relative tolerance
 
             // display current proportion
-            
+
+            // proportional tolerance
+            if (toleranceMode == false)
+            {
+
+                if (currentProportion < topTolerance && currentProportion > bottomTolerance)
+                {
+                    return greenBrush;
+                }
+
+                // bottom red -> yellow
+                else if (currentProportion > bottomRed && currentProportion < bottomYellow)
+                {
+                    //int index = Convert.ToInt32((currentProportion - bottomRed) * (1 / arrayPrecision)) - 1;
+                    //return brushArray[index];
+                    double map = (1 / proportionalYellowRedFade) * (currentProportion - bottomRed);
+                    return new SolidColorBrush(ColorInterpolator.InterpolateBetween(Colors.Red, Colors.Yellow, map));
+
+                }
+                // bottom yellow -> green
+                else if (currentProportion > bottomYellow && currentProportion < bottomTolerance)
+                {
+                    double map = (1 / proportionalGreenYellowFade) * (currentProportion - bottomYellow);
+                    return new SolidColorBrush(ColorInterpolator.InterpolateBetween(Colors.Yellow, Colors.Green, map));
+                }
+                // top green -> yellow
+                else if (currentProportion > topTolerance && currentProportion < topYellow)
+                {
+                    double map = (1 / proportionalGreenYellowFade) * (currentProportion - topTolerance);
+                    return new SolidColorBrush(ColorInterpolator.InterpolateBetween(Colors.Green, Colors.Yellow, map));
+                }
+                // top yellow -> red
+                else if (currentProportion > topYellow && currentProportion < topRed)
+                {
+                    double map = (1 / proportionalYellowRedFade) * (currentProportion - topYellow);
+                    return new SolidColorBrush(ColorInterpolator.InterpolateBetween(Colors.Yellow, Colors.Red, map));
+                }
+                else return redBrush;
+            }
 
 
-            if (currentProportion < topTolerance && currentProportion > bottomTolerance)
+            // absolute tolerance:
+            // height region that the lower hand moves through where screen is green. e.g., if absolute tolerance = 10,
+            // and the proportion is 1:2 (left:right), when the right is at 200, the left hand can be anywhere between 
+            // (100 - 10) and (100 + 10).
+            else
             {
-                return greenBrush;
-            }
+                
+                
+                // figure out the height of the highest hand
+                double higherHandHeight = Math.Max(calibratedLeftHandPos, calibratedRightHandPos);
+                double lowerHandHeight = Math.Min(calibratedLeftHandPos, calibratedRightHandPos);
 
-            // bottom red -> yellow
-            else if (currentProportion > bottomRed && currentProportion < bottomYellow)
-            {
-                //int index = Convert.ToInt32((currentProportion - bottomRed) * (1 / arrayPrecision)) - 1;
-                //return brushArray[index];
-                double map = (1 / yellowRedFade) * (currentProportion - bottomRed);
-                return new SolidColorBrush(ColorInterpolator.InterpolateBetween(Colors.Red, Colors.Yellow, map));
+                //
+                double heightThatLowerHandShouldBeAt = proportion * higherHandHeight;
+                double upperAbsoluteToleranceBound = heightThatLowerHandShouldBeAt + absoluteTolerance;
+                double lowerAbsoluteToleranceBound = heightThatLowerHandShouldBeAt - absoluteTolerance;
 
+                topYellow = upperAbsoluteToleranceBound + absoluteGreenYellowFade;
+                topRed = upperAbsoluteToleranceBound + absoluteGreenYellowFade + absoluteYellowRedFade;
+
+                bottomYellow = lowerAbsoluteToleranceBound - absoluteGreenYellowFade;
+                bottomRed = lowerAbsoluteToleranceBound - absoluteGreenYellowFade - absoluteYellowRedFade;
+
+
+                if (lowerHandHeight < upperAbsoluteToleranceBound 
+                    && lowerHandHeight > lowerAbsoluteToleranceBound)
+                {
+                    return greenBrush;
+                }
+
+                // bottom red -> yellow
+                else if (lowerHandHeight > bottomRed
+                    && lowerHandHeight < bottomYellow)
+                {
+                    double map = (lowerHandHeight - bottomRed) / absoluteYellowRedFade;
+                    return new SolidColorBrush(ColorInterpolator.InterpolateBetween(Colors.Red, Colors.Yellow, map));
+                }
+
+                // bottom yellow -> green
+                else if (lowerHandHeight > bottomYellow 
+                    && lowerHandHeight < lowerAbsoluteToleranceBound)
+                {
+                    double map = (lowerHandHeight - bottomYellow) / absoluteGreenYellowFade;
+                    return new SolidColorBrush(ColorInterpolator.InterpolateBetween(Colors.Yellow, Colors.Green, map));
+                }
+
+                // top green -> yellow
+                else if (lowerHandHeight > upperAbsoluteToleranceBound 
+                    && lowerHandHeight < topYellow)
+                {
+                    double map = (lowerHandHeight - upperAbsoluteToleranceBound) / absoluteGreenYellowFade;
+                    return new SolidColorBrush(ColorInterpolator.InterpolateBetween(Colors.Green, Colors.Yellow, map));
+                }
+                // top yellow -> red
+                else if (lowerHandHeight > topYellow 
+                    && lowerHandHeight < topRed)
+                {
+                    double map = (lowerHandHeight - topYellow) / absoluteYellowRedFade;
+                    return new SolidColorBrush(ColorInterpolator.InterpolateBetween(Colors.Yellow, Colors.Red, map));
+                }
+                else return redBrush;
             }
-            // bottom yellow -> green
-            else if (currentProportion > bottomYellow && currentProportion < bottomTolerance)
-            {
-                double map = (1 / greenYellowFade) * (currentProportion - bottomYellow);
-                return new SolidColorBrush(ColorInterpolator.InterpolateBetween(Colors.Yellow, Colors.Green, map));
-            }
-            // top green -> yellow
-            else if (currentProportion > topTolerance && currentProportion < topYellow)
-            {
-                double map = (1 / greenYellowFade) * (currentProportion - topTolerance);
-                return new SolidColorBrush(ColorInterpolator.InterpolateBetween(Colors.Green, Colors.Yellow, map));
-            }
-            // top yellow -> red
-            else if (currentProportion > topYellow && currentProportion < topRed)
-            {
-                double map = (1 / yellowRedFade) * (currentProportion - topYellow);
-                return new SolidColorBrush(ColorInterpolator.InterpolateBetween(Colors.Yellow, Colors.Red, map));
-            }
-            else return redBrush;
         }
 
 
@@ -1174,6 +1645,7 @@ namespace SkeletalTracking
                     if (calibrationBaseline > 0)
                     {
                         isCalibrated = true;
+                        
                     }
                 }
                 inCalibrationMode = false;

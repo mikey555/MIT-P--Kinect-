@@ -1,0 +1,20 @@
+﻿Microsoft.Samples.Kinect.WpfViewers
+
+
+library
+C#
+.cs
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\KinectDemo\SkeletonDemo\SkeletalTracking\KinectWpfViewers\obj\Release\
+Microsoft.Samples.Kinect.WpfViewers
+none
+false
+TRACE
+
+3173858053
+
+8-1381246665
+13507976673
+KinectDepthViewer.xaml;KinectColorViewer.xaml;KinectDiagnosticViewer.xaml;
+
+True
+

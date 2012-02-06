@@ -1,0 +1,28 @@
+C:\Program Files\Microsoft SDKs\Kinect\v1.0 Beta2\Samples\KinectSDKSamples\Managed\SkeletalViewer\bin\Debug\SkeletalViewer.exe.config
+C:\Program Files\Microsoft SDKs\Kinect\v1.0 Beta2\Samples\KinectSDKSamples\Managed\SkeletalViewer\bin\Debug\SkeletalViewer.exe
+C:\Program Files\Microsoft SDKs\Kinect\v1.0 Beta2\Samples\KinectSDKSamples\Managed\SkeletalViewer\bin\Debug\SkeletalViewer.pdb
+C:\Program Files\Microsoft SDKs\Kinect\v1.0 Beta2\Samples\KinectSDKSamples\Managed\SkeletalViewer\bin\Debug\Microsoft.Samples.Kinect.WpfViewers.dll
+C:\Program Files\Microsoft SDKs\Kinect\v1.0 Beta2\Samples\KinectSDKSamples\Managed\SkeletalViewer\bin\Debug\INuiInstanceHelper.dll
+C:\Program Files\Microsoft SDKs\Kinect\v1.0 Beta2\Samples\KinectSDKSamples\Managed\SkeletalViewer\bin\Debug\Microsoft.Samples.Kinect.WpfViewers.pdb
+C:\Program Files\Microsoft SDKs\Kinect\v1.0 Beta2\Samples\KinectSDKSamples\Managed\SkeletalViewer\obj\Debug\ResolveAssemblyReference.cache
+C:\Program Files\Microsoft SDKs\Kinect\v1.0 Beta2\Samples\KinectSDKSamples\Managed\SkeletalViewer\obj\Debug\MainWindow.baml
+C:\Program Files\Microsoft SDKs\Kinect\v1.0 Beta2\Samples\KinectSDKSamples\Managed\SkeletalViewer\obj\Debug\MainWindow.g.cs
+C:\Program Files\Microsoft SDKs\Kinect\v1.0 Beta2\Samples\KinectSDKSamples\Managed\SkeletalViewer\obj\Debug\App.g.cs
+C:\Program Files\Microsoft SDKs\Kinect\v1.0 Beta2\Samples\KinectSDKSamples\Managed\SkeletalViewer\obj\Debug\SkeletalViewer_MarkupCompile.cache
+C:\Program Files\Microsoft SDKs\Kinect\v1.0 Beta2\Samples\KinectSDKSamples\Managed\SkeletalViewer\obj\Debug\SkeletalViewer.g.resources
+C:\Program Files\Microsoft SDKs\Kinect\v1.0 Beta2\Samples\KinectSDKSamples\Managed\SkeletalViewer\obj\Debug\SkeletalViewer.exe
+C:\Program Files\Microsoft SDKs\Kinect\v1.0 Beta2\Samples\KinectSDKSamples\Managed\SkeletalViewer\obj\Debug\SkeletalViewer.pdb
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\KinectDemo\SkeletonDemo\SkeletalTracking\SkeletalViewer\bin\Debug\SkeletalViewer.exe.config
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\KinectDemo\SkeletonDemo\SkeletalTracking\SkeletalViewer\bin\Debug\SkeletalViewer.exe
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\KinectDemo\SkeletonDemo\SkeletalTracking\SkeletalViewer\bin\Debug\SkeletalViewer.pdb
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\KinectDemo\SkeletonDemo\SkeletalTracking\SkeletalViewer\bin\Debug\Microsoft.Samples.Kinect.WpfViewers.dll
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\KinectDemo\SkeletonDemo\SkeletalTracking\SkeletalViewer\bin\Debug\INuiInstanceHelper.dll
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\KinectDemo\SkeletonDemo\SkeletalTracking\SkeletalViewer\bin\Debug\Microsoft.Samples.Kinect.WpfViewers.pdb
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\KinectDemo\SkeletonDemo\SkeletalTracking\SkeletalViewer\obj\Debug\ResolveAssemblyReference.cache
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\KinectDemo\SkeletonDemo\SkeletalTracking\SkeletalViewer\obj\Debug\MainWindow.baml
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\KinectDemo\SkeletonDemo\SkeletalTracking\SkeletalViewer\obj\Debug\MainWindow.g.cs
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\KinectDemo\SkeletonDemo\SkeletalTracking\SkeletalViewer\obj\Debug\App.g.cs
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\KinectDemo\SkeletonDemo\SkeletalTracking\SkeletalViewer\obj\Debug\SkeletalViewer_MarkupCompile.cache
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\KinectDemo\SkeletonDemo\SkeletalTracking\SkeletalViewer\obj\Debug\SkeletalViewer.g.resources
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\KinectDemo\SkeletonDemo\SkeletalTracking\SkeletalViewer\obj\Debug\SkeletalViewer.exe
+C:\Users\Michael\Documents\Visual Studio 2010\Projects\KinectDemo\SkeletonDemo\SkeletalTracking\SkeletalViewer\obj\Debug\SkeletalViewer.pdb

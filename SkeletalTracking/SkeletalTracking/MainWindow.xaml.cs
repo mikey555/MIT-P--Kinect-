@@ -47,7 +47,11 @@ namespace SkeletalTracking
         // Grid setup
 
 
-        public void updateGrid(System.Collections.ArrayList linesList)
+
+
+
+
+        public void updateGrid(System.Collections.ArrayList linesList, System.Collections.ArrayList numbersList)
         {
             //IEnumerator<Line> childrenEnumerator = (IEnumerator<Line>) grid.Children.GetEnumerator();
             lineGrid.Children.Clear();
@@ -55,14 +59,15 @@ namespace SkeletalTracking
             {
                 lineGrid.Children.Add(l);
             }
-
+            foreach (TextBlock n in numbersList)
+            {
+                lineGrid.Children.Add(n);
+            }
 
         }
 
 
-
-
-
+        
 
 
 
@@ -159,8 +164,8 @@ namespace SkeletalTracking
         // these stay here
         // crosshair rate
         int rotationMode = 0;
-        bool crosshairsEnabled = true;
-        public void enableCrosshairs()
+        bool crosshairsEnabled = false;
+        public void toggleCrosshairs()
         {
             // if crosshairs are enabled, hide them
             if (crosshairsEnabled == true)
@@ -198,7 +203,24 @@ namespace SkeletalTracking
             return crosshairPos;
 
         }
+
+        public void setCrosshairSize(double crosshairSize)
+        {
+            ScaleTransform scaletransform = new ScaleTransform(crosshairSize, crosshairSize, 50, 50);
             
+            crosshair1.RenderTransform = scaletransform;
+            crosshair2.RenderTransform = scaletransform;
+
+        }
+
+        public void setCrosshairThickness(double crosshairThickness)
+        {
+            horizLineLeft.StrokeThickness = crosshairThickness;
+            horizLineRight.StrokeThickness = crosshairThickness;
+            vertLineLeft.StrokeThickness = crosshairThickness;
+            vertLineRight.StrokeThickness = crosshairThickness;
+            
+        }
             
             
         
@@ -218,40 +240,51 @@ namespace SkeletalTracking
             }
         }
 
-        /// <summary>
-        /// dev -> rotated:
-        /// - clear active dev properties
-        /// - set to-be-active rotated properties
-        /// </summary>
-        /// <param name="newRotationMode"></param>
+        private void defaultCrosshairPositions(int newRotationMode)
+        {
+            if (newRotationMode == 0)
+            {
+                crosshair1.SetValue(Canvas.LeftProperty, (double)50);
+                crosshair1.SetValue(Canvas.BottomProperty, (double)GridSettings.verticalGapSize - 44);
+
+                crosshair2.SetValue(Canvas.RightProperty, (double) 50);
+                crosshair2.SetValue(Canvas.BottomProperty, (double)GridSettings.verticalGapSize - 44);
+            }
+            else if (newRotationMode == 1)
+            {
+                crosshair1.SetValue(Canvas.RightProperty, (double)GridSettings.verticalGapSize - 54);
+                crosshair1.SetValue(Canvas.BottomProperty, (double)50);
+
+                crosshair2.SetValue(Canvas.RightProperty, (double)GridSettings.verticalGapSize - 54);
+                crosshair2.SetValue(Canvas.TopProperty, (double)50);
+            }
+        }
+
         public void changeRotationMode(int newRotationMode)
         {
             //if (newRotationMode != rotationMode)
             //{
                 rotationMode = newRotationMode;
-                if (newRotationMode == 0)
+
+                // subtract 44 from crosshair heights so that they line up with the baseline.
+            if (newRotationMode == 0)
                 {
 
                     crosshair1.ClearValue(Canvas.RightProperty);
-                    crosshair1.SetValue(Canvas.LeftProperty, (double) 50);
-                    crosshair1.SetValue(Canvas.BottomProperty, (double) GridSettings.gapSize - 50);
-
                     crosshair2.ClearValue(Canvas.TopProperty);
-                    crosshair2.SetValue(Canvas.RightProperty, (double) 50);
-                    crosshair2.SetValue(Canvas.BottomProperty, (double)GridSettings.gapSize - 50);
+                    defaultCrosshairPositions(newRotationMode);
                 }
                 
-                // 47 is the magic number. the crosshairs are 100 pixels, so in theory they should be shifted 50,
-                // which is half the length of a crosshair.
+                // subtract 54 from crosshair heights so that they line up with the baseline.
                 else if (newRotationMode == 1)
                 {
 
                     crosshair1.ClearValue(Canvas.LeftProperty);
-                    crosshair1.SetValue(Canvas.RightProperty, (double)GridSettings.gapSize - 47);
+                    crosshair1.SetValue(Canvas.RightProperty, (double)GridSettings.verticalGapSize - 54);
                     crosshair1.SetValue(Canvas.BottomProperty, (double) 50);
 
                     crosshair2.ClearValue(Canvas.BottomProperty);
-                    crosshair2.SetValue(Canvas.RightProperty, (double)GridSettings.gapSize - 47);
+                    crosshair2.SetValue(Canvas.RightProperty, (double)GridSettings.verticalGapSize - 54);
                     crosshair2.SetValue(Canvas.TopProperty, (double) 50);
                     
                 }

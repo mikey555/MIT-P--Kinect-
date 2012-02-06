@@ -8,7 +8,7 @@
         xmlns:my="clr-namespace:System;assembly=mscorlib" AllowsTransparency="False" Opacity="50" BorderBrush="Black" OpacityMask="#FF000032" mc:Ignorable="d" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
         Height="1050"
         Width="800"
-        DataContext="{Binding}" Left="0" Top="0">
+        DataContext="{Binding}" Left="0" Top="0" ResizeMode="NoResize">
     <Window.Resources>
         <my:Double x:Key="Canvas.Top1">507</my:Double>
         <SolidColorBrush x:Key="BlackGridLine" Color="Black" />
@@ -16,24 +16,22 @@
     </Window.Resources>
     <Canvas Name="MainCanvas" Background="White" DataContext="{Binding}">
         
-        <Grid Height="1050" Canvas.Left="-13" Canvas.Top="0" Width="805" Name="lineGrid" Visibility="Visible">
-            <TextBlock Height="77" Name="textBlock1" Text="test" Width="413" FontFamily="Courier New" FontSize="60" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="191,866,201,107" Panel.ZIndex="0" />
+        <Grid Height="1011" Canvas.Left="0" Canvas.Top="0" Width="778" Name="lineGrid" Visibility="Visible">
+            <TextBlock Height="77" Name="textBlock1" Text="test" Width="413" FontFamily="Courier New" FontSize="60" FontWeight="Bold" TextAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="191,864,201,70" Panel.ZIndex="0" />
         </Grid>
         <Grid Height="94" Canvas.Bottom="0" Canvas.Left="50" Width="104" Name="crosshair1" Visibility="Visible">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="96" />
-                <ColumnDefinition Width="4" />
-            </Grid.ColumnDefinitions>
-            <Line X1="12" Y1="50" X2="89" Y2="50" Stroke="Black" StrokeThickness="4" Canvas.Left="51" Canvas.Top="467" Height="94" Width="100" Grid.ColumnSpan="2" />
-            <Line Canvas.Left="51" Canvas.Top="467" Height="94" Stroke="Black" StrokeThickness="4" Width="100" X1="50" X2="50" Y1="90" Y2="10" Grid.ColumnSpan="2" />
+            <Grid.RenderTransform>
+                <ScaleTransform ScaleX="1" ScaleY="1" CenterX="50" CenterY="50"></ScaleTransform>
+            </Grid.RenderTransform>
+            <Line Name="horizLineLeft" X1="12" Y1="50" X2="89" Y2="50" Stroke="Black" StrokeThickness="4" Canvas.Left="51" Canvas.Top="467" Height="94" Width="100" Grid.ColumnSpan="2" Margin="0,0,4,0" />
+            <Line Canvas.Left="51" Name="vertLineLeft" Canvas.Top="467" Height="94" Stroke="Black" StrokeThickness="4" X1="50" X2="50" Y1="90" Y2="10" />
         </Grid>
-        <Grid Height="94" Canvas.Bottom="0" Canvas.Right="50" Width="104" Name="crosshair2" Visibility="Visible">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="96" />
-                <ColumnDefinition Width="4" />
-            </Grid.ColumnDefinitions>
-            <Line X1="12" Y1="50" X2="89" Y2="50" Stroke="Black" StrokeThickness="4" Canvas.Left="51" Canvas.Top="467" Height="94" Width="100" Grid.ColumnSpan="2" />
-            <Line Canvas.Left="51" Canvas.Top="467" Height="94" Stroke="Black" StrokeThickness="4" Width="100" X1="50" X2="50" Y1="90" Y2="10" Grid.ColumnSpan="2" />
+        <Grid  Height="94" Canvas.Bottom="0" Canvas.Right="50" Width="104" Name="crosshair2" Visibility="Visible">
+            <Grid.RenderTransform>
+                <ScaleTransform ScaleX="1" ScaleY="1" CenterX="50" CenterY="50"></ScaleTransform>
+            </Grid.RenderTransform>
+            <Line Name="horizLineRight" X1="12" Y1="50" X2="89" Y2="50" Stroke="Black" StrokeThickness="4" Canvas.Left="51" Canvas.Top="467" Height="94" Width="100" Grid.ColumnSpan="2" />
+            <Line Name="vertLineRight" Canvas.Left="51" Canvas.Top="467" Height="94" Stroke="Black" StrokeThickness="4" Width="100" X1="50" X2="50" Y1="90" Y2="10" Grid.ColumnSpan="2" />
         </Grid>
     </Canvas>
 </Window>
